@@ -1,99 +1,77 @@
 package net.blacklab.lmr;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
-import net.blacklab.lib.config.ConfigList;
-import net.blacklab.lib.vevent.VEventBus;
-import net.blacklab.lmr.achievements.AchievementsLMRE;
-import net.blacklab.lmr.client.resource.OldZipTexturesWrapper;
-import net.blacklab.lmr.client.resource.SoundResourcePack;
+import net.blacklab.lmr.client.entity.EntityLittleMaidForTexSelect;
+import net.blacklab.lmr.config.Config;
 import net.blacklab.lmr.entity.EntityLittleMaid;
-import net.blacklab.lmr.event.EventHookLMRE;
+import net.blacklab.lmr.entity.EntityMarkerDummy;
+import net.blacklab.lmr.entity.renderfactory.RenderFactoryLittleMaid;
+import net.blacklab.lmr.entity.renderfactory.RenderFactoryMarkerDummy;
+import net.blacklab.lmr.entity.renderfactory.RenderFactoryModelSelect;
 import net.blacklab.lmr.item.ItemMaidPorter;
-import net.blacklab.lmr.item.ItemMaidSpawnEgg;
+import net.blacklab.lmr.item.ItemSpawnEgg;
 import net.blacklab.lmr.item.ItemTriggerRegisterKey;
 import net.blacklab.lmr.network.GuiHandler;
 import net.blacklab.lmr.network.LMRNetwork;
 import net.blacklab.lmr.network.ProxyCommon;
 import net.blacklab.lmr.util.DevMode;
 import net.blacklab.lmr.util.FileList;
-import net.blacklab.lmr.util.FileList.CommonClassLoaderWrapper;
 import net.blacklab.lmr.util.IFF;
 import net.blacklab.lmr.util.helper.CommonHelper;
 import net.blacklab.lmr.util.manager.EntityModeManager;
 import net.blacklab.lmr.util.manager.ModelManager;
-import net.blacklab.lmr.util.manager.StabilizerManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResourcePack;
-import net.minecraft.client.resources.SimpleReloadableResourceManager;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 @Mod(
-		modid = LittleMaidReengaged.DOMAIN,
+		modid = LittleMaidReengaged.MODID,
 		name = "LittleMaidReengaged",
 		version = LittleMaidReengaged.VERSION,
 		acceptedMinecraftVersions=LittleMaidReengaged.ACCEPTED_MCVERSION,
-		dependencies = LittleMaidReengaged.DEPENDENCIES,
-		updateJSON = "http://mc.el-blacklab.net/lmr-version.json")
+		dependencies = LittleMaidReengaged.DEPENDENCIES)
 public class LittleMaidReengaged {
 
-	public static final String DOMAIN = "lmreengaged";
+	public static final String MODID = "lmreengaged";
 	public static final String VERSION = "8.0.1.66";
 	public static final String ACCEPTED_MCVERSION = "[1.12.2]";
-	public static final int VERSION_CODE = 1;
 	public static final String DEPENDENCIES = "required-after:forge@[1.12.2-14.23.0.2517,)";
-			//+ "required-after:net.blacklab.lib@[5.2.0.3,)";
 
-	/*
-	 * public static String[] cfg_comment = {
-	 * "spawnWeight = Relative spawn weight. The lower the less common. 10=pigs. 0=off"
-	 * , "spawnLimit = Maximum spawn count in the World.",
-	 * "minGroupSize = Minimum spawn group count.",
-	 * "maxGroupSize = Maximum spawn group count.",
-	 * "canDespawn = It will despawn, if it lets things go. ",
-	 * "checkOwnerName = At local, make sure the name of the owner. ",
-	 * "antiDoppelganger = Not to survive the doppelganger. ",
-	 * "enableSpawnEgg = Enable LMM SpawnEgg Recipe. ",
-	 * "VoiceDistortion = LittleMaid Voice distortion.",
-	 * "defaultTexture = Default selected Texture Packege. Null is Random",
-	 * "DebugMessage = Print Debug Massages.",
-	 * "DeathMessage = Print Death Massages.", "Dominant = Spawn Anywhere.",
-	 * "Aggressive = true: Will be hostile, false: Is a pacifist",
-	 * "IgnoreItemList = aaa, bbb, ccc: Items little maid to ignore",
-	 * "AchievementID = used Achievement index.(0 = Disable)",
-	 * "UniqueEntityId = UniqueEntityId(0 is AutoAssigned. max 255)" };
-	 */
+	public static final CreativeTab creativeTab = new CreativeTab(MODID);
 
 	// @MLProp(info="Relative spawn weight. The lower the less common. 10=pigs. 0=off")
 	public static int cfg_spawnWeight = 5;
@@ -127,24 +105,17 @@ public class LittleMaidReengaged {
 	public static boolean cfg_isFixedWildMaid = false;
 
 	// LivingSoundRate
-	public static float cfg_voiceRate = 0.1f;
+	public static double cfg_voiceRate = 0.1d;
 
-	// @MLProp(info="true: AlphaBlend(request power), false: AlphaTest(more fast)")
-	// public static boolean AlphaBlend = true;
-	// @MLProp(info="true: Will be hostile, false: Is a pacifist")
 	public static boolean cfg_Aggressive = true;
 	public static int cfg_maidOverdriveDelay = 64;
 
 	@SidedProxy(clientSide = "net.blacklab.lmr.network.ProxyClient", serverSide = "net.blacklab.lmr.network.ProxyCommon")
 	public static ProxyCommon proxy;
 
-	@Instance(DOMAIN)
+	@Instance(MODID)
 	public static LittleMaidReengaged instance;
 
-	// Item
-	public static ItemMaidSpawnEgg spawnEgg;
-	public static ItemTriggerRegisterKey registerKey;
-	public static ItemMaidPorter maidPorter;
 
 	public static void Debug(String pText, Object... pVals) {
 		// デバッグメッセージ
@@ -165,24 +136,11 @@ public class LittleMaidReengaged {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt) {
-		// MMMLibからの引継ぎ
-		// ClassLoaderを初期化
-		List<URL> urls = new ArrayList<URL>();
-		try {
-			urls.add(FileList.dirMods.toURI().toURL());
-		} catch (MalformedURLException e1) {
-		}
-		if(DevMode.DEVMODE==DevMode.DEVMODE_ECLIPSE){
-			for(File f:FileList.dirDevIncludeClasses){
-				try {
-					urls.add(f.toURI().toURL());
-				} catch (MalformedURLException e) {
-				}
-			}
-		}
-		FileList.COMMON_CLASS_LOADER = new CommonClassLoaderWrapper(urls.toArray(new URL[]{}), LittleMaidReengaged.class.getClassLoader());
+		initClassLoader();
 
-		StabilizerManager.init();
+		//is this even used?
+		//StabilizerManager.init();
+
 
 		// テクスチャパックの構築
 		ModelManager.instance.init();
@@ -199,181 +157,152 @@ public class LittleMaidReengaged {
 			ModelManager.instance.loadTextureServer();
 		}
 
-		// FileManager.setSrcPath(evt.getSourceFile());
-		// MMM_cfg_init();
-
-		// MMMLibのRevisionチェック
-		// MMM_Helper.checkRevision("6");
-		// MMM_cfg_checkConfig(this.getClass());
-
 		randomSoundChance = new Random();
 
 		// Config
 		// エラーチェックのため試験的にimportしない形にしてみる
-		ConfigList cfg = new ConfigList();
-		try {
-			cfg.loadConfig(getName(), evt);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		cfg_Aggressive = cfg.getBoolean("Aggressive", true);
-		cfg_antiDoppelganger = cfg.getBoolean("antiDoppelganger", true);
-		cfg.setComment("canDespawn", "Whether a LittleMaid(no-contract) can despawn.");
-		cfg_canDespawn = cfg.getBoolean("canDespawn", false);
-		cfg.setComment("checkOwnerName", "Recommended to keep 'true'. If 'true', on SMP, each player can tame his/her own maids.");
-		cfg_checkOwnerName = cfg.getBoolean("checkOwnerName", true);
-		cfg.setComment("DeathMessage", "Print chat message when your maid dies.");
-		cfg_DeathMessage = cfg.getBoolean("DeathMessage", true);
-		cfg.setComment("VoiceDistortion", "If 'true', voices distorts like as vanila mobs.");
-		cfg_VoiceDistortion = cfg.getBoolean("VoiceDistortion", false);
-		cfg_Dominant = cfg.getBoolean("Dominant", false);
-		cfg.setComment("enableSpawnEgg", "If 'true', you can use a recipe of LittleMaid SpawnEgg.");
-		cfg_enableSpawnEgg = cfg.getBoolean("enableSpawnEgg", true);
-		cfg.setComment("maxGroupSize", "This config adjusts LittleMaids spawning.");
-		cfg_maxGroupSize = cfg.getInt("maxGroupSize", 3);
-		cfg.setComment("minGroupSize", "This config adjusts LittleMaids spawning.");
-		cfg_minGroupSize = cfg.getInt("minGroupSize", 1);
-		cfg.setComment("spawnLimit", "This config adjusts LittleMaids spawning.");
-		cfg_spawnLimit = cfg.getInt("spawnLimit", 20);
-		cfg.setComment("spawnWeight", "This config adjusts LittleMaids spawning.");
-		cfg_spawnWeight = cfg.getInt("spawnWeight", 5);
-		cfg.setComment("PrintDebugMessage", "Output messages for debugging to log. Usually this should be 'false'.");
-		cfg_PrintDebugMessage = cfg.getBoolean("PrintDebugMessage", false);
-		cfg.setComment("isModelAlphaBlend", "If 'false', alpha-blend of textures is disabled.");
-		cfg_isModelAlphaBlend = cfg.getBoolean("isModelAlphaBlend", true);
-		cfg.setComment("isFixedWildMaid", "If 'true', additional textures of LittleMaid(no-contract) will never used.");
-		cfg_isFixedWildMaid = cfg.getBoolean("isFixedWildMaid", false);
-		cfg_voiceRate = cfg.getFloat("voiceRate", 0.2f);
-		cfg.setComment("voiceRate", "Ratio of playing non-force sound");
+		Config.preInit();
+		cfg_Aggressive = Config.getConfig().getCategory("general").get("Aggressive").getBoolean();
+		cfg_antiDoppelganger = Config.getConfig().getCategory("general").get("antiDoppelganger").getBoolean();
+		cfg_canDespawn = Config.getConfig().getCategory("general").get("canDespawn").getBoolean();
+		cfg_checkOwnerName = Config.getConfig().getCategory("general").get("checkOwnerName").getBoolean();
+		cfg_DeathMessage = Config.getConfig().getCategory("general").get("DeathMessage").getBoolean();
 
-		cfg_maidOverdriveDelay = cfg.getInt("maidOverdriveDelay", 32);
-		if (cfg_maidOverdriveDelay < 1) {
-			cfg_maidOverdriveDelay = 1;
-		} else if (cfg_maidOverdriveDelay > 128) {
-			cfg_maidOverdriveDelay = 128;
-		}
+		cfg_VoiceDistortion = Config.getConfig().getCategory("general").get("VoiceDistortion").getBoolean();
+		cfg_Dominant = Config.getConfig().getCategory("general").get("Dominant").getBoolean();
+		cfg_enableSpawnEgg = Config.getConfig().getCategory("general").get("enableSpawnEgg").getBoolean();
 
-		try {
-			cfg.saveConfig(getName(), evt);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		cfg_maxGroupSize = Config.getConfig().getCategory("general").get("maxGroupSize").getInt();
+		cfg_minGroupSize = Config.getConfig().getCategory("general").get("minGroupSize").getInt();
+		cfg_spawnLimit = Config.getConfig().getCategory("general").get("spawnLimit").getInt();
+		cfg_spawnWeight = Config.getConfig().getCategory("general").get("spawnWeight").getInt();
 
-//		latestVersion = Version.getLatestVersion("http://mc.el-blacklab.net/lmmnxversion.txt", 10000);
+		cfg_PrintDebugMessage = Config.getConfig().getCategory("general").get("PrintDebugMessage").getBoolean();
+		cfg_isModelAlphaBlend = Config.getConfig().getCategory("general").get("isModelAlphaBlend").getBoolean();
+		cfg_isFixedWildMaid = Config.getConfig().getCategory("general").get("isFixedWildMaid").getBoolean();
 
-		EntityRegistry.registerModEntity(new ResourceLocation(DOMAIN, "LittleMaid"), EntityLittleMaid.class,
-				"LittleMaid", 0, instance, 80, 1, true);
+		cfg_voiceRate = Config.getConfig().getCategory("general").get("voiceRate").getDouble();
+		cfg_maidOverdriveDelay = Config.getConfig().getCategory("general").get("maidOverdriveDelay").getInt();
 
-		spawnEgg = new ItemMaidSpawnEgg();
-		ForgeRegistries.ITEMS.register(spawnEgg);
-		if (cfg_enableSpawnEgg) {
-			GameRegistry.addShapedRecipe(
-					new ResourceLocation(DOMAIN, "spawn_littlemaid_egg"),
-					null,
-					new ItemStack(spawnEgg, 1),
-					new Object[] { "scs", "sbs", " e ", Character.valueOf('s'),
-							Items.SUGAR, Character.valueOf('c'),
-							new ItemStack(Items.DYE, 1, 3),
-							Character.valueOf('b'), Items.SLIME_BALL,
-							Character.valueOf('e'), Items.EGG, });
-		}
-
-		registerKey = new ItemTriggerRegisterKey();
-		ForgeRegistries.ITEMS.register(registerKey);
-
-		GameRegistry.addShapelessRecipe(
-			new ResourceLocation(DOMAIN, "registerkey"),
-			null,
-			new ItemStack(registerKey),
-			Ingredient.fromItem(Items.EGG),
-			Ingredient.fromItem(Items.SUGAR),
-			Ingredient.fromItem(Items.NETHER_WART)
-		);
-
-		maidPorter = new ItemMaidPorter();
-		ForgeRegistries.ITEMS.register(maidPorter);
+		ItemTriggerRegisterKey.DEFAULT_ITEM = new ItemTriggerRegisterKey();
+		ItemMaidPorter.DEFAULT_ITEM = new ItemMaidPorter();
 		
 		// AIリストの追加
 		EntityModeManager.init();
 
-		// アイテムスロット更新用のパケット
-		LMRNetwork.init(DOMAIN);
-
-		// Register model and renderer
-		proxy.rendererRegister();
+		LMRNetwork.init(MODID);
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		proxy.loadSounds();
-
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
+		MinecraftForge.EVENT_BUS.register(new EntityLittleMaid.MaidEvents());
 
-		if (CommonHelper.isClient) {
-			SimpleReloadableResourceManager resourceManager = ((SimpleReloadableResourceManager)Minecraft.getMinecraft().getResourceManager());
-			resourceManager.reloadResourcePack(new SoundResourcePack());
-			resourceManager.reloadResourcePack(new OldZipTexturesWrapper());
-			Minecraft.getMinecraft().getSoundHandler().onResourceManagerReload(resourceManager);
-		}
-
-		MinecraftForge.EVENT_BUS.register(new EventHookLMRE());
-		VEventBus.instance.registerListener(new EventHookLMRE());
+		proxy.init();
 	}
-
-	// public static ProxyClient.CountThread countThread;
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent evt) {
-		// カンマ区切りのアイテム名のリストを配列にして設定
-		// "aaa, bbb,ccc  " -> "aaa" "bbb" "ccc"
-
-		// デフォルトモデルの設定
-		// MMM_TextureManager.instance.setDefaultTexture(LMM_EntityLittleMaid.class,
-		// MMM_TextureManager.instance.getTextureBox("default_Orign"));
-
-		// Dominant
-		Biome[] biomeList = null;
 
 		if (cfg_spawnWeight > 0) {
-			Iterator<Biome> biomeIterator = Biome.REGISTRY.iterator();
-			while(biomeIterator.hasNext()) {
-				Biome biome = biomeIterator.next();
+			HashSet<BiomeDictionary.Type> spawnBiomes = new HashSet<>();
+			spawnBiomes.add(BiomeDictionary.Type.HOT);
+			spawnBiomes.add(BiomeDictionary.Type.DRY);
+			spawnBiomes.add(BiomeDictionary.Type.SAVANNA);
+			spawnBiomes.add(BiomeDictionary.Type.CONIFEROUS);
+			spawnBiomes.add(BiomeDictionary.Type.MUSHROOM);
+			spawnBiomes.add(BiomeDictionary.Type.FOREST);
+			spawnBiomes.add(BiomeDictionary.Type.PLAINS);
+			spawnBiomes.add(BiomeDictionary.Type.SANDY);
+			spawnBiomes.add(BiomeDictionary.Type.BEACH);
+			//spawnBiomes.add(BiomeDictionary.Type.COLD);
+			//spawnBiomes.add(BiomeDictionary.Type.SNOWY);
+			//spawnBiomes.add(BiomeDictionary.Type.LUSH);
 
-				if(biome != null &&
-						(
-								(BiomeDictionary.hasType(biome, BiomeDictionary.Type.HOT) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.COLD) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.WET) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.DRY) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.SAVANNA) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.CONIFEROUS) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.LUSH) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.MUSHROOM) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.FOREST) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.PLAINS) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.SANDY) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY) ||
-										BiomeDictionary.hasType(biome, BiomeDictionary.Type.BEACH))
-								)
-						)
-				{
-					EntityRegistry.addSpawn(EntityLittleMaid.class, cfg_spawnWeight, cfg_minGroupSize, cfg_maxGroupSize, EnumCreatureType.CREATURE, biome);
-					System.out.println("Registering spawn in " + biome.getBiomeName());
-					Debug("Registering maids to spawn in " + biome.getBiomeName());
+			for(Biome biome : Biome.REGISTRY)
+				if(biome != null)
+					for(BiomeDictionary.Type biomeType : spawnBiomes)
+						if(BiomeDictionary.hasType(biome, biomeType))
+							registerSpawnBiome(biome);
+
+		}
+
+		// init Entity Modes
+		EntityModeManager.loadEntityMode();
+		EntityModeManager.showLoadedModes();
+
+		// IFFのロード
+		IFF.loadIFFs();
+	}
+
+	@Mod.EventBusSubscriber
+	public static class ObjectRegistryHandler {
+		@SubscribeEvent
+		public static void registerRecipes(RegistryEvent.Register<IRecipe> event){
+			ItemTriggerRegisterKey.registerRecipe(event);
+
+			if(cfg_enableSpawnEgg)
+				ItemSpawnEgg.registerRecipe(event);
+		}
+
+		@SubscribeEvent
+		public static void addItems(RegistryEvent.Register<Item> event) {
+			event.getRegistry().register(ItemTriggerRegisterKey.DEFAULT_ITEM);
+			event.getRegistry().register(ItemMaidPorter.DEFAULT_ITEM);
+		}
+
+		@SubscribeEvent
+		public static void registerEntities(RegistryEvent.Register<EntityEntry> event){
+			EntityRegistry.registerModEntity(new ResourceLocation(MODID, EntityLittleMaid.NAME), EntityLittleMaid.class, EntityLittleMaid.NAME, 2, instance, 80, 3, true, 0x36A8FF, 0xFF2626);
+		}
+
+		@SubscribeEvent
+		@SideOnly(Side.CLIENT)
+		public static void onRegisterModels(ModelRegistryEvent event) {
+			ModelLoader.setCustomModelResourceLocation(ItemMaidPorter.DEFAULT_ITEM, 0, new ModelResourceLocation(ItemMaidPorter.DEFAULT_ITEM.getRegistryName().toString()));
+			ModelLoader.setCustomModelResourceLocation(ItemTriggerRegisterKey.DEFAULT_ITEM, 0, new ModelResourceLocation(ItemTriggerRegisterKey.DEFAULT_ITEM.getRegistryName().toString()));
+
+			RenderingRegistry.registerEntityRenderingHandler(EntityLittleMaid.class, new RenderFactoryLittleMaid());
+			RenderingRegistry.registerEntityRenderingHandler(EntityLittleMaidForTexSelect.class, new RenderFactoryModelSelect());
+			RenderingRegistry.registerEntityRenderingHandler(EntityMarkerDummy.class, new RenderFactoryMarkerDummy());
+		}
+	}
+
+	static void registerSpawnBiome(Biome biome){
+		EntityRegistry.addSpawn(EntityLittleMaid.class, cfg_spawnWeight, cfg_minGroupSize, cfg_maxGroupSize, EnumCreatureType.CREATURE, biome);
+		Debug("Registering maids to spawn in " + biome.getBiomeName());
+	}
+
+	public static class CreativeTab extends CreativeTabs {
+		public CreativeTab(String unlocalizedName) {
+			super(unlocalizedName);
+		}
+
+		@Override
+		@SideOnly(Side.CLIENT)
+		public ItemStack getTabIconItem() {
+			return new ItemStack(Items.SUGAR, 1);
+		}
+	}
+
+	private void initClassLoader(){
+		List<URL> urls = new ArrayList<URL>();
+		try {
+			urls.add(FileList.dirMods.toURI().toURL());
+		} catch (MalformedURLException e1) {
+			Debug("malformed URL");
+		}
+		if(DevMode.DEVMODE==DevMode.DEVMODE_ECLIPSE){
+			for(File f:FileList.dirDevIncludeClasses){
+				try {
+					urls.add(f.toURI().toURL());
+				} catch (MalformedURLException e) {
+					Debug("malformed URL");
 				}
 			}
 		}
 
-		// モードリストを構築
-		EntityModeManager.loadEntityMode();
-		EntityModeManager.showLoadedModes();
-
-		// サウンドのロード
-		// TODO ★ proxy.loadSounds();
-
-		// IFFのロード
-		IFF.loadIFFs();
-
+		FileList.COMMON_CLASS_LOADER = new FileList.CommonClassLoaderWrapper(urls.toArray(new URL[]{}), LittleMaidReengaged.class.getClassLoader());
 	}
 
 }

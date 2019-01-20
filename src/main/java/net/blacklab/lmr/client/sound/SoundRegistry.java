@@ -9,11 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.blacklab.lib.obj.Pair;
-import net.blacklab.lib.obj.SinglePair;
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.util.EnumSound;
-import net.blacklab.lmr.util.FileList;
+import net.blacklab.lmr.util.Pair;
+import net.blacklab.lmr.util.SinglePair;
 
 public class SoundRegistry {
 
@@ -47,7 +46,7 @@ public class SoundRegistry {
 		} else if (map.containsKey(new SinglePair(texture, color)) && !map.get(new SinglePair(texture, color)).equals("<P>")) {
 			return;
 		}
-		map.put(new SinglePair<String, Integer>(texture, color), name.toLowerCase());
+		map.put(new SinglePair<String, Integer>(texture, color), name);
 	}
 
 	public static void setLivingVoiceRatio(String name, Float ratio) {
@@ -57,7 +56,7 @@ public class SoundRegistry {
 	public static Float getLivingVoiceRatio(String name) {
 		Float f = ratioMap.get(name);
 		if (f == null) {
-			f = LittleMaidReengaged.cfg_voiceRate;
+			f = (float) LittleMaidReengaged.cfg_voiceRate;
 		}
 		return f;
 	}
@@ -124,7 +123,6 @@ public class SoundRegistry {
 
 	public static void registerSoundPath(String name, String path) {
 		// サウンドの種類を増やす
-		name = name.toLowerCase();
 		List<String> g = instR.pathMap.get(name);
 		if (g == null) {
 			instR.pathMap.put(name, new ArrayList<String>());
@@ -167,24 +165,24 @@ public class SoundRegistry {
 	}
 
 	public static boolean isSoundNameRegistered(String name) {
-		return getRegisteredNamesList().contains(name.toLowerCase());
+		return getRegisteredNamesList().contains(name);
 	}
 
 	public static List<String> getPathListFromRegisteredName(String name) {
-		return instR.pathMap.get(name.toLowerCase());
+		return instR.pathMap.get(name);
 	}
 
 	public static String getPathFromRegisteredName(String name){
-		List<String> g = getPathListFromRegisteredName(name.toLowerCase());
+		List<String> g = getPathListFromRegisteredName(name);
 		if (g == null) return null;
 		String ret = g.get((int)(Math.random() * g.size()));
 		return ret;
 	}
 
 	public static InputStream getSoundStream(String name) {
-		String aString = getPathFromRegisteredName(name.toLowerCase());
+		String aString = getPathFromRegisteredName(name);
 		LittleMaidReengaged.Debug("GETSTREAM %s", aString);
-		return FileList.COMMON_CLASS_LOADER.getResourceAsStream(aString);
+		return LittleMaidReengaged.class.getClassLoader().getResourceAsStream(aString);
 	}
 
 	public static InputStream getSoundStream(EnumSound sound, String texture, Integer color) {

@@ -10,7 +10,6 @@ import net.blacklab.lmr.network.EnumPacketMode;
 import net.blacklab.lmr.util.helper.CommonHelper;
 import net.blacklab.lmr.util.helper.ItemHelper;
 import net.blacklab.lmr.util.helper.MaidHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -22,7 +21,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
 public class ExperienceHandler {
@@ -183,13 +181,13 @@ public class ExperienceHandler {
 	}
 
 	public void readEntityFromNBT(NBTTagCompound tagCompound) {
-		isWaitRevive = tagCompound.getBoolean(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_WAIT");
-		deathCount = tagCompound.getInteger(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_DCNT");
-		pauseCount = tagCompound.getInteger(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_PCNT");
-		requiredSugarToRevive = tagCompound.getInteger(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_REQ");
-		String causeType = tagCompound.getString(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_CAUSE_T");
+		isWaitRevive = tagCompound.getBoolean(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_WAIT");
+		deathCount = tagCompound.getInteger(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_DCNT");
+		pauseCount = tagCompound.getInteger(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_PCNT");
+		requiredSugarToRevive = tagCompound.getInteger(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_REQ");
+		String causeType = tagCompound.getString(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_CAUSE_T");
 		if (causeType != null && !causeType.isEmpty()) {
-			NBTTagCompound causeEntityTag = tagCompound.getCompoundTag(LittleMaidReengaged.DOMAIN + ":HADNLER_DEATH_CAUSE_E");
+			NBTTagCompound causeEntityTag = tagCompound.getCompoundTag(LittleMaidReengaged.MODID + ":HADNLER_DEATH_CAUSE_E");
 			if (causeEntityTag != null) {
 				Entity entity = EntityList.createEntityFromNBT(causeEntityTag, theMaid.world);
 				if (entity != null) {
@@ -202,15 +200,15 @@ public class ExperienceHandler {
 	}
 
 	public void writeEntityToNBT(NBTTagCompound tagCompound) {
-		tagCompound.setBoolean(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_WAIT", isWaitRevive);
-		tagCompound.setInteger(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_DCNT", deathCount);
-		tagCompound.setInteger(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_PCNT", pauseCount);
-		tagCompound.setInteger(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_REQ", requiredSugarToRevive);
-		tagCompound.setString(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_CAUSE_T", deadCause.getDamageType());
+		tagCompound.setBoolean(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_WAIT", isWaitRevive);
+		tagCompound.setInteger(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_DCNT", deathCount);
+		tagCompound.setInteger(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_PCNT", pauseCount);
+		tagCompound.setInteger(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_REQ", requiredSugarToRevive);
+		tagCompound.setString(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_CAUSE_T", deadCause.getDamageType());
 		if (deadCause.getImmediateSource() != null) {
 			NBTTagCompound causeEntityTag = new NBTTagCompound();
 			deadCause.getImmediateSource().writeToNBT(causeEntityTag);
-			tagCompound.setTag(LittleMaidReengaged.DOMAIN + ":EXP_HANDLER_DEATH_CAUSE_E", causeEntityTag);
+			tagCompound.setTag(LittleMaidReengaged.MODID + ":EXP_HANDLER_DEATH_CAUSE_E", causeEntityTag);
 		}
 	}
 

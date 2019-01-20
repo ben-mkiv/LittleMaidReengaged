@@ -20,10 +20,10 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import net.blacklab.lmr.util.FileClassUtil;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.logging.log4j.Level;
 
-import net.blacklab.lib.classutil.FileClassUtil;
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.entity.maidmodel.TextureBox;
 import net.blacklab.lmr.util.EnumSound;
@@ -182,7 +182,7 @@ public class SoundLoader {
 		}
 
 		// 先にlivingVoiceRateのみを読み込み
-		float livingVoiceRate = LittleMaidReengaged.cfg_voiceRate;
+		float livingVoiceRate = 0.2f;
 		for (String buf: readLines) {
 			if (buf.startsWith("LivingVoiceRate=")) {
 				String vals[] = buf.split("=");
@@ -211,26 +211,26 @@ public class SoundLoader {
 					// テクスチャネーム
 					String texname = SoundRegistry.DEFAULT_TEXTURE_REGISTRATION_KEY;
 					switch (vlStrings.length) {
-					case 3:
-						texname = vlStrings[0];
-					case 2:
-						try {
-							col = Integer.valueOf(vlStrings[vlStrings.length - 2]);
-							if (col > 15) col = 15;
-							if (col < -1) col = -1;
-						} catch (NumberFormatException e) {
-						}
-					case 1:
-						String tString = texture!=null ? texture : texname;
-						if (texture == null && SoundRegistry.isTexVoiceMarked(texname)) {
-							LittleMaidReengaged.Debug("TEXTURE %s is marked by cfg", texname);
+						case 3:
+							texname = vlStrings[0];
+						case 2:
+							try {
+								col = Integer.valueOf(vlStrings[vlStrings.length - 2]);
+								if (col > 15) col = 15;
+								if (col < -1) col = -1;
+							} catch (NumberFormatException e) {
+							}
+						case 1:
+							String tString = texture!=null ? texture : texname;
+							if (texture == null && SoundRegistry.isTexVoiceMarked(texname)) {
+								LittleMaidReengaged.Debug("TEXTURE %s is marked by cfg", texname);
+								break;
+							}
+							LittleMaidReengaged.Debug("REGISTER NAME %s, %s, %s", tString, col, name);
+							SoundRegistry.registerSoundName(sound, tString, col, name);
 							break;
-						}
-						LittleMaidReengaged.Debug("REGISTER NAME %s, %s, %s", tString, col, name);
-						SoundRegistry.registerSoundName(sound, tString, col, name);
-						break;
-					default:
-						break;
+						default:
+							break;
 					}
 					if ((sound.index & 0xf00) == EnumSound.living_daytime.index) {
 						// LivingSound
@@ -272,33 +272,33 @@ public class SoundLoader {
 			// トップブロック
 			output.add("{");
 
-				Iterator iterator = SoundRegistry.getRegisteredNamesList().iterator();
-				while (iterator.hasNext()) {
-					String soundName = (String) iterator.next();
+			Iterator iterator = SoundRegistry.getRegisteredNamesList().iterator();
+			while (iterator.hasNext()) {
+				String soundName = (String) iterator.next();
 
-					List m = SoundRegistry.getPathListFromRegisteredName(soundName);
-					// サウンド登録名
-					output.add("  \"" + soundName + "\": {");
+				List m = SoundRegistry.getPathListFromRegisteredName(soundName);
+				// サウンド登録名
+				output.add("  \"" + soundName + "\": {");
 
-					// サウンドの各種設定
-					output.add("    \"category\": \"master\",");
-					output.add("    \"sounds\": [");
-					if (m!=null && !m.isEmpty()) {
-						Iterator n = m.iterator();
-						while (n.hasNext()) {
-							String path = (String) n.next();
-							output.add("      \""+LittleMaidReengaged.DOMAIN+":" + soundName + "//" + path + "\"" + (n.hasNext() ? "," : ""));
-						}
-					}
-
-					output.add("    ]");
-
-					output.add("  }");
-
-					if (iterator.hasNext()) {
-						output.add("  ,");
+				// サウンドの各種設定
+				output.add("    \"category\": \"master\",");
+				output.add("    \"sounds\": [");
+				if (m!=null && !m.isEmpty()) {
+					Iterator n = m.iterator();
+					while (n.hasNext()) {
+						String path = (String) n.next();
+						output.add("      \""+LittleMaidReengaged.MODID+":" + soundName + "//" + path + "\"" + (n.hasNext() ? "," : ""));
 					}
 				}
+
+				output.add("    ]");
+
+				output.add("  }");
+
+				if (iterator.hasNext()) {
+					output.add("  ,");
+				}
+			}
 
 			output.add("}");
 
@@ -308,10 +308,6 @@ public class SoundLoader {
 			e.printStackTrace();
 		}
 
-		try {
-			FileList.COMMON_CLASS_LOADER.addURL(jsonDir.toURI().toURL());
-		} catch (MalformedURLException e) {
-		}
 	}
 
 	private void appendPath() {

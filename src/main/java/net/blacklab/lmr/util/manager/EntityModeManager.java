@@ -11,16 +11,15 @@ import net.blacklab.lmr.util.FileList;
 public class EntityModeManager extends ManagerBase {
 
 	public static final String prefix = "EntityMode";
-	public static List<EntityModeBase> maidModeList = new ArrayList<EntityModeBase>();
+	public static List<EntityModeBase> maidModeList = new ArrayList<>();
 
 
 	public static void init() {
-		// 特定名称をプリフィックスに持つmodファイをを獲得
 		FileList.getModFile("EntityMode", prefix);
 	}
-	
+
 	public static void loadEntityMode() {
-		(new EntityModeManager()).load();
+		new EntityModeManager().load();
 	}
 
 	@Override
@@ -30,20 +29,18 @@ public class EntityModeManager extends ManagerBase {
 
 	@Override
 	protected boolean append(Class pclass) {
-		// プライオリティー順に追加
-		// ソーター使う？
 		if (!EntityModeBase.class.isAssignableFrom(pclass)) {
 			return false;
 		}
-		
+
 		try {
-			EntityModeBase lemb = null;
+			EntityModeBase lemb;
 			lemb = (EntityModeBase)pclass.getConstructor(EntityLittleMaid.class).newInstance((EntityLittleMaid)null);
 			lemb.init();
-			
-			//既存
-			if(maidModeList.contains(lemb)) return false;
-			
+
+			if(maidModeList.contains(lemb))
+				return false;
+
 			if (maidModeList.isEmpty() || lemb.priority() >= maidModeList.get(maidModeList.size() - 1).priority()) {
 				maidModeList.add(lemb);
 			} else {
@@ -57,14 +54,13 @@ public class EntityModeManager extends ManagerBase {
 
 			return true;
 		} catch (Exception e) {
-		} catch (Error e) {
+			LittleMaidReengaged.Debug("couldnt append mode: " + pclass.getName());
+			return false;
 		}
-
-		return false;
 	}
 
 	/**
-	 * AI追加用のリストを獲得。 
+	 * AI追加用のリストを獲得。
 	 */
 	public static List<EntityModeBase> getModeList(EntityLittleMaid pentity) {
 		List<EntityModeBase> llist = new ArrayList<EntityModeBase>();
@@ -72,10 +68,10 @@ public class EntityModeManager extends ManagerBase {
 			try {
 				llist.add(lmode.getClass().getConstructor(EntityLittleMaid.class).newInstance(pentity));
 			} catch (Exception e) {
-			} catch (Error e) {
+				LittleMaidReengaged.Debug("getModeList failed for Entity " + pentity.getName());
 			}
 		}
-		
+
 		return llist;
 	}
 
@@ -83,7 +79,7 @@ public class EntityModeManager extends ManagerBase {
 	 * ロードされているモードリストを表示する。
 	 */
 	public static void showLoadedModes() {
-		LittleMaidReengaged.Debug("Loaded Mode lists(%d)", maidModeList.size());
+		LittleMaidReengaged.Debug("Loaded Entity Modes (%d)", maidModeList.size());
 		for (EntityModeBase lem : maidModeList) {
 			LittleMaidReengaged.Debug("%04d : %s", lem.priority(), lem.getClass().getSimpleName());
 		}

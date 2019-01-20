@@ -2,23 +2,17 @@ package net.blacklab.lmr.entity.ai;
 
 import java.util.List;
 
-import net.blacklab.lib.minecraft.vector.VectorUtil;
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.util.EnumSound;
 import net.blacklab.lmr.util.helper.ItemHelper;
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 
 public class EntityAILMCollectItem extends EntityAIBase {
 

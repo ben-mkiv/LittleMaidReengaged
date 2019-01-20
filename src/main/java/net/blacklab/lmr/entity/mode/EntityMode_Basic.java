@@ -3,7 +3,6 @@ package net.blacklab.lmr.entity.mode;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.blacklab.lib.vevent.VEventBus;
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.api.event.EventLMRE;
 import net.blacklab.lmr.api.mode.UtilModeFarmer;
@@ -28,6 +27,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
 
 public class EntityMode_Basic extends EntityModeBlockBase {
 
@@ -365,7 +366,7 @@ public class EntityMode_Basic extends EntityModeBlockBase {
 
 			if (!is.isEmpty()){
 				EventLMRE.ItemPutChestEvent event = new EventLMRE.ItemPutChestEvent(owner,myChest,is,maidSearchCount);
-				if(!VEventBus.instance.post(event)){
+				if(!MinecraftForge.EVENT_BUS.post(event)){
 //					mod_littleMaidMob.Debug("getchest2.");
 					boolean f = false;
 					for (int j = 0; j < myChest.getSizeInventory() && is.getCount() > 0; j++)

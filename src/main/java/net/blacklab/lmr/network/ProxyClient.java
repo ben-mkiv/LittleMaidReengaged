@@ -6,12 +6,16 @@ import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.client.entity.EntityLittleMaidForTexSelect;
 import net.blacklab.lmr.client.gui.GuiIFF;
 import net.blacklab.lmr.client.gui.inventory.GuiMaidInventory;
+import net.blacklab.lmr.client.resource.OldZipTexturesWrapper;
+import net.blacklab.lmr.client.resource.SoundResourcePack;
 import net.blacklab.lmr.client.sound.SoundLoader;
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.entity.EntityMarkerDummy;
 import net.blacklab.lmr.entity.renderfactory.RenderFactoryLittleMaid;
 import net.blacklab.lmr.entity.renderfactory.RenderFactoryMarkerDummy;
 import net.blacklab.lmr.entity.renderfactory.RenderFactoryModelSelect;
+import net.blacklab.lmr.item.ItemMaidPorter;
+import net.blacklab.lmr.item.ItemTriggerRegisterKey;
 import net.blacklab.lmr.util.EnumSound;
 import net.blacklab.lmr.util.IFF;
 import net.blacklab.lmr.util.helper.CommonHelper;
@@ -20,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleItemPickup;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -32,30 +37,20 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
  * マルチ用に分離。
  * 分離しとかないとNoSuchMethodで落ちる。
  */
-public class ProxyClient extends ProxyCommon
-{
-	public void rendererRegister() {
-		ModelLoader.setCustomModelResourceLocation(
-				LittleMaidReengaged.spawnEgg, 0, new ModelResourceLocation(
-						LittleMaidReengaged.DOMAIN+":spawn_littlemaid_egg", "inventory"));
-		ModelLoader.setCustomModelResourceLocation(LittleMaidReengaged.registerKey, 0,
-				new ModelResourceLocation(LittleMaidReengaged.DOMAIN+":registerkey",
-						"inventory"));
-		ModelLoader.setCustomModelResourceLocation(LittleMaidReengaged.registerKey, 1,
-				new ModelResourceLocation(LittleMaidReengaged.DOMAIN+":registerkey",
-						"inventory"));
+public class ProxyClient extends ProxyCommon {
 
-		String porter_modelName_A = LittleMaidReengaged.DOMAIN + ":maidporter_0";
-		String porter_modelName_B = LittleMaidReengaged.DOMAIN + ":maidporter_1";
-//		ModelLoader.addVariantName(LittleMaidReengaged.maidPorter, LittleMaidReengaged.DOMAIN + ":maidporter_0", LittleMaidReengaged.DOMAIN + ":maidporter_1");
-		ModelBakery.registerItemVariants(LittleMaidReengaged.maidPorter, new ResourceLocation(porter_modelName_A), new ResourceLocation(porter_modelName_B));
-		ModelLoader.setCustomModelResourceLocation(LittleMaidReengaged.maidPorter, 0, new ModelResourceLocation(porter_modelName_A, "inventory"));
-		ModelLoader.setCustomModelResourceLocation(LittleMaidReengaged.maidPorter, 1, new ModelResourceLocation(porter_modelName_B, "inventory"));
+	@Override
+	public void init(){
+		loadSounds();
 
-		RenderingRegistry.registerEntityRenderingHandler(EntityLittleMaid.class, new RenderFactoryLittleMaid());
-		RenderingRegistry.registerEntityRenderingHandler(EntityLittleMaidForTexSelect.class, new RenderFactoryModelSelect());
-		RenderingRegistry.registerEntityRenderingHandler(EntityMarkerDummy.class, new RenderFactoryMarkerDummy());
+		SimpleReloadableResourceManager resourceManager = ((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager());
+		resourceManager.reloadResourcePack(new SoundResourcePack());
+		resourceManager.reloadResourcePack(new OldZipTexturesWrapper());
+
+		Minecraft.getMinecraft().getSoundHandler().onResourceManagerReload(resourceManager);
 	}
+
+
 
 	/* 呼び出し箇所なし
 	public GuiContainer getContainerGUI(EntityClientPlayerMP var1, int var2,

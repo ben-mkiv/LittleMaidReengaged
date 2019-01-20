@@ -1,12 +1,12 @@
 package net.blacklab.lmr.api.event;
 
-import net.blacklab.lib.vevent.IVEventCancelable;
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.fml.common.eventhandler.Event;
 
-public class EventLMRE implements IVEventCancelable {
+public class EventLMRE extends Event {
 	
 	private boolean canceled = false;
 	
@@ -23,7 +23,7 @@ public class EventLMRE implements IVEventCancelable {
 	}
 
 	@Cancelable
-	public static class ItemPutChestEvent extends EventLMRE{
+	public static class ItemPutChestEvent extends EventLMRE {
 		
 		public IInventory target;
 		public ItemStack stack;
@@ -41,24 +41,5 @@ public class EventLMRE implements IVEventCancelable {
 	public EventLMRE(EntityLittleMaid living) {
 		maid = living;
 	}
-	
-	@Override
-	public void setCanceled(boolean flag) {
-		if (!canceled) canceled = flag; 
-	}
-	
-	@Override
-	public boolean isCanceled() {
-		return canceled;
-	}
-	
-	@Override
-	public Result getResult() {
-		return Result.PASS;
-	}
 
-	@Override
-	public void setResult(Result result) {
-	}
-	
 }

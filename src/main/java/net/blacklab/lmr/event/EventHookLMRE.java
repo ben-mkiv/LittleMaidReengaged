@@ -1,21 +1,14 @@
 package net.blacklab.lmr.event;
 
-import net.blacklab.lib.vevent.SubscribeVEvent;
 import net.blacklab.lmr.LittleMaidReengaged;
-import net.blacklab.lmr.api.event.EventLMRE;
-import net.blacklab.lmr.api.mode.UtilModeFarmer;
 import net.blacklab.lmr.client.entity.EntityLittleMaidAvatarSP;
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.entity.EntityLittleMaidAvatarMP;
 import net.blacklab.lmr.entity.IEntityLittleMaidAvatar;
-import net.blacklab.lmr.entity.mode.EntityMode_Basic;
-import net.blacklab.lmr.util.helper.ItemHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -138,20 +131,7 @@ public class EventHookLMRE
 		return false;
 	}
 
-	@SubscribeVEvent
-	public void onItemPutChest(EventLMRE.ItemPutChestEvent event){
-		LittleMaidReengaged.Debug("HOOK");
-		EntityLittleMaid maid = event.maid;
-		ItemStack stack = event.stack;
 
-		if(ItemHelper.isSugar(stack.getItem()) || stack.getItem() == Items.CLOCK){
-			event.setCanceled(true);
-		}
 
-		if(maid.getMaidModeInt() == EntityMode_Basic.mmode_FarmPorter){
-			if(event.maidStackIndex <= 13 && UtilModeFarmer.isSeed(maid.getMaidMasterUUID(), stack.getItem()) || UtilModeFarmer.isHoe(maid, stack)){
-				event.setCanceled(true);
-			}
-		}
-	}
+
 }

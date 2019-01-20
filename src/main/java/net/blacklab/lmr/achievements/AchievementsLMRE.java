@@ -5,7 +5,6 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 
 public class AchievementsLMRE {
@@ -14,7 +13,7 @@ public class AchievementsLMRE {
 			return;
 		
 		AdvancementManager manager = player.world.getMinecraftServer().getAdvancementManager();
-		Advancement advancement = manager.getAdvancement(new ResourceLocation(LittleMaidReengaged.DOMAIN, advancementName));
+		Advancement advancement = manager.getAdvancement(new ResourceLocation(LittleMaidReengaged.MODID, advancementName));
 		if (advancement == null)
 			return;
 		

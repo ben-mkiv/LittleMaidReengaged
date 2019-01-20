@@ -2,13 +2,13 @@ package net.blacklab.lmr.entity.mode;
 
 import java.util.Iterator;
 
-import net.blacklab.lib.minecraft.vector.VectorUtil;
 import net.blacklab.lmr.achievements.AchievementsLMRE;
 import net.blacklab.lmr.api.mode.UtilModeFarmer;
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.inventory.InventoryLittleMaid;
 import net.blacklab.lmr.util.EnumSound;
 import net.blacklab.lmr.util.TriggerSelect;
+import net.blacklab.lmr.util.VectorUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockFarmland;

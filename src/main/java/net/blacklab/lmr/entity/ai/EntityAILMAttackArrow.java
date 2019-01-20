@@ -1,6 +1,5 @@
 package net.blacklab.lmr.entity.ai;
 
-import net.blacklab.lib.minecraft.vector.VectorUtil;
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.entity.IEntityLittleMaidAvatar;
@@ -54,19 +53,14 @@ public class EntityAILMAttackArrow extends EntityAIBase implements IEntityAI {
 
 	@Override
 	public boolean shouldExecute() {
-		EntityLivingBase entityliving = fMaid.getAttackTarget();
-		boolean a = isExecutable();
-		if (a && !VectorUtil.canMoveThrough(
-				fMaid, fMaid.getEyeHeight(),
-				entityliving.posX, entityliving.posY+entityliving.getEyeHeight(), entityliving.posZ, false, true, false)) {
+		if (isExecutable() && !fMaid.canEntityBeSeen(fMaid.getAttackTarget())) {
 			fMaid.setAttackTarget(null);
-			//fMaid.setTarget(null);
-//			fMaid.getNavigator().clearPathEntity();
+			//fMaid.getNavigator().clearPathEntity();
 			fTarget = null;
 			resetTask();
 			return false;
 		}
-		return a;
+		return isExecutable();
 	}
 
 	protected boolean isExecutable() {

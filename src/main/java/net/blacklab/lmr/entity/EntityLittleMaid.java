@@ -24,12 +24,11 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import net.blacklab.lib.minecraft.item.ItemUtil;
-import net.blacklab.lib.vevent.VEventBus;
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.achievements.AchievementsLMRE;
 import net.blacklab.lmr.api.event.EventLMRE;
 import net.blacklab.lmr.api.item.IItemSpecialSugar;
+import net.blacklab.lmr.api.mode.UtilModeFarmer;
 import net.blacklab.lmr.client.entity.EntityLittleMaidAvatarSP;
 import net.blacklab.lmr.client.sound.SoundLoader;
 import net.blacklab.lmr.client.sound.SoundRegistry;
@@ -59,6 +58,7 @@ import net.blacklab.lmr.entity.maidmodel.ModelConfigCompound;
 import net.blacklab.lmr.entity.maidmodel.TextureBox;
 import net.blacklab.lmr.entity.maidmodel.TextureBoxBase;
 import net.blacklab.lmr.entity.mode.EntityModeBase;
+import net.blacklab.lmr.entity.mode.EntityMode_Basic;
 import net.blacklab.lmr.entity.mode.EntityMode_Playing;
 import net.blacklab.lmr.entity.pathnavigate.PathNavigatorLittleMaid;
 import net.blacklab.lmr.inventory.InventoryLittleMaid;
@@ -108,10 +108,7 @@ import net.minecraft.entity.projectile.EntityArrow.PickupStatus;
 import net.minecraft.entity.projectile.EntitySnowball;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemAxe;
-import net.minecraft.item.ItemPotion;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
@@ -145,11 +142,13 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.TempCategory;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityLittleMaid extends EntityTameable implements IModelEntity {
-
+	public static String NAME = "littlemaid";
 	// 定数はStaticsへ移動
 //	protected static final UUID maidUUID = UUID.nameUUIDFromBytes("lmm.littleMaidMob".getBytes());
 	protected static final UUID maidUUID = UUID.fromString("e2361272-644a-3028-8416-8536667f0efb");
@@ -1297,17 +1296,17 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 		par1nbtTagCompound.setInteger("homeZ", getPosition().getZ());
 		par1nbtTagCompound.setInteger("homeWorld", homeWorld);
 
-		par1nbtTagCompound.setFloat(LittleMaidReengaged.DOMAIN + ":MAID_EXP", maidExperience);
-		par1nbtTagCompound.setInteger(LittleMaidReengaged.DOMAIN + ":EXP_BOOST", gainExpBoost);
+		par1nbtTagCompound.setFloat(LittleMaidReengaged.MODID + ":MAID_EXP", maidExperience);
+		par1nbtTagCompound.setInteger(LittleMaidReengaged.MODID + ":EXP_BOOST", gainExpBoost);
 
 		// 肩車
 		boolean isRide = isRiding();
-		par1nbtTagCompound.setBoolean(LittleMaidReengaged.DOMAIN + ":riding", isRide);
+		par1nbtTagCompound.setBoolean(LittleMaidReengaged.MODID + ":riding", isRide);
 		if (isRide) {
 			if (getRidingEntity() instanceof EntityPlayer) {
-				par1nbtTagCompound.setString(LittleMaidReengaged.DOMAIN + ":ridingPlayer", getRidingEntity().getUniqueID().toString());
+				par1nbtTagCompound.setString(LittleMaidReengaged.MODID + ":ridingPlayer", getRidingEntity().getUniqueID().toString());
 			}
-			par1nbtTagCompound.setIntArray(LittleMaidReengaged.DOMAIN + ":lastPosition", new int[]{(int) posX, (int) posY, (int) posZ});
+			par1nbtTagCompound.setIntArray(LittleMaidReengaged.MODID + ":lastPosition", new int[]{(int) posX, (int) posY, (int) posZ});
 		}
 
 		// Tiles
@@ -1406,17 +1405,17 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 
 		isMadeTextureNameFlag = par1nbtTagCompound.getBoolean("isMadeTextureNameFlag");
 
-		maidExperience = par1nbtTagCompound.getFloat(LittleMaidReengaged.DOMAIN + ":MAID_EXP");
-		setExpBooster(par1nbtTagCompound.getInteger(LittleMaidReengaged.DOMAIN + ":EXP_BOOST"));
+		maidExperience = par1nbtTagCompound.getFloat(LittleMaidReengaged.MODID + ":MAID_EXP");
+		setExpBooster(par1nbtTagCompound.getInteger(LittleMaidReengaged.MODID + ":EXP_BOOST"));
 		dataManager.set(EntityLittleMaid.dataWatch_MaidExpValue, maidExperience);
 
 		// 肩車
-		boolean isRide = par1nbtTagCompound.getBoolean(LittleMaidReengaged.DOMAIN + ":riding");
+		boolean isRide = par1nbtTagCompound.getBoolean(LittleMaidReengaged.MODID + ":riding");
 		if (isRide) {
-			int[] lastPosition = par1nbtTagCompound.getIntArray(LittleMaidReengaged.DOMAIN + ":lastPosition");
+			int[] lastPosition = par1nbtTagCompound.getIntArray(LittleMaidReengaged.MODID + ":lastPosition");
 			setLocationAndAngles(lastPosition[0], lastPosition[1], lastPosition[2], 0, 0);
 
-			String playerUid = par1nbtTagCompound.getString(LittleMaidReengaged.DOMAIN + ":ridingPlayer");
+			String playerUid = par1nbtTagCompound.getString(LittleMaidReengaged.MODID + ":ridingPlayer");
 			if (!playerUid.isEmpty()) {
 				try {
 					EntityPlayer ridingPlayer = world.getPlayerEntityByUUID(UUID.fromString(playerUid));
@@ -1859,7 +1858,7 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 					continue;
 				}
 
-				String sname = SoundRegistry.getSoundRegisteredName(enumsound, textureNameMain, getColor());
+				String sname = ""; //SoundRegistry.getSoundRegisteredName(enumsound, textureNameMain, getColor());
 				LittleMaidReengaged.Debug("STC %s,%d/FRS %s", textureNameMain, getColor(), sname);
 
 				if (sname == null || sname.isEmpty()) {
@@ -1870,7 +1869,7 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 				if ((enumsound.index & 0xf00) == EnumSound.living_daytime.index) {
 					// LivingSound LivingVoiceRateを確認
 					Float ratio = SoundRegistry.getLivingVoiceRatio(sname);
-					if (ratio == null) ratio = LittleMaidReengaged.cfg_voiceRate;
+					if (ratio == null) ratio = (float) LittleMaidReengaged.cfg_voiceRate;
 					// カットオフ
 					if (rand.nextFloat() > ratio) {
 						playingSound.remove(enumsound);
@@ -1880,8 +1879,8 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 
 				LittleMaidReengaged.Debug(String.format("id:%d, se:%04x-%s (%s)", getEntityId(), enumsound.index, enumsound.name(), sname));
 
-//				playSound(LittleMaidReengaged.DOMAIN+":"+sname, lpitch);
-				world.playSound(posX, posY, posZ, new SoundEvent(new ResourceLocation(LittleMaidReengaged.DOMAIN+":"+sname)), getSoundCategory(), getSoundVolume(), lpitch, false);
+//				playSound(LittleMaidReengaged.MODID+":"+sname, lpitch);
+				world.playSound(posX, posY, posZ, new SoundEvent(new ResourceLocation(LittleMaidReengaged.MODID +":"+sname)), getSoundCategory(), getSoundVolume(), lpitch, false);
 				playingSound.remove(enumsound);
 			}
 //			LMM_LittleMaidMobNX.proxy.playLittleMaidSound(world, posX, posY, posZ, playingSound, getSoundVolume(), lpitch, false);
@@ -1894,7 +1893,7 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 	 */
 	private boolean isBlockTranslucent(int par1, int par2, int par3) {
 		IBlockState iState = world.getBlockState(new BlockPos(par1, par2, par3));
-		return iState.getBlock().isNormalCube(iState);
+		return iState.isNormalCube();
 	}
 
 	/**
@@ -2448,11 +2447,10 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 		// 死因を表示
 //		if (!world.isRemote) {
 			if (LittleMaidReengaged.cfg_DeathMessage && getMaidMasterEntity() != null) {
-				getMaidMasterEntity().sendMessage(new TextComponentTranslation("littleMaidMob.chat.text.death", CommonHelper.getDeadSource(par1DamageSource)));
+				getMaidMasterEntity().sendStatusMessage(new TextComponentTranslation("littleMaidMob.chat.text.death", getName(), par1DamageSource.getDamageType()), false);
 			}
 //		}
 	}
-
 	/**
 	 * Client専用．
 	 */
@@ -2877,7 +2875,7 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 								}
 								return true;
 							}
-							else if (par3ItemStack.getItem()==LittleMaidReengaged.registerKey &&
+							else if (par3ItemStack.getItem().equals(ItemTriggerRegisterKey.DEFAULT_ITEM) &&
 									!par1EntityPlayer.world.isRemote) {
 								// トリガーセット
 								if (registerTick.isEnable()) {
@@ -3564,7 +3562,7 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 	}
 
 	public boolean isHeadMount(){
-		return ItemUtil.isHelm(maidInventory.armorInventory.get(3));
+		return !maidInventory.armorInventory.get(3).isEmpty();
 	}
 
 	/**
@@ -3620,7 +3618,8 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 				flag = true;
 			}
 			getExperienceHandler().onLevelUp(currentLevel+1);
-			VEventBus.instance.post(new EventLMRE.MaidLevelUpEvent(this, getMaidLevel()));
+			//todo: fix this event
+			//VEventBus.instance.post(new EventLMRE.MaidLevelUpEvent(this, getMaidLevel()));
 		}
 	}
 
@@ -3785,8 +3784,6 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 
 	/**
 	 * フラグ群に値をセット。
-	 * @param pCheck： 対象値。
-	 * @param pFlags： 対象フラグ。
 	 */
 	public void setMaidFlags(boolean pFlag, int pFlagvalue) {
 		int li = dataManager.get(EntityLittleMaid.dataWatch_Flags);
@@ -4138,4 +4135,27 @@ public class EntityLittleMaid extends EntityTameable implements IModelEntity {
 	{
 		super.setSize(par1, par2);
 	}
+
+
+
+	public static class MaidEvents {
+		@SubscribeEvent
+		public void onItemPutChest (EventLMRE.ItemPutChestEvent event){
+			LittleMaidReengaged.Debug("HOOK");
+			EntityLittleMaid maid = event.maid;
+			ItemStack stack = event.stack;
+
+			if (ItemHelper.isSugar(stack.getItem()) || stack.getItem() == Items.CLOCK) {
+				event.setCanceled(true);
+			}
+
+			if (maid.getMaidModeInt() == EntityMode_Basic.mmode_FarmPorter) {
+				if (event.maidStackIndex <= 13 && UtilModeFarmer.isSeed(maid.getMaidMasterUUID(), stack.getItem()) || UtilModeFarmer.isHoe(maid, stack)) {
+					event.setCanceled(true);
+				}
+			}
+		}
+	}
+
+
 }

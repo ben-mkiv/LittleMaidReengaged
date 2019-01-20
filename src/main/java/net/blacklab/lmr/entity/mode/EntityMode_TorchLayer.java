@@ -1,11 +1,10 @@
 package net.blacklab.lmr.entity.mode;
 
-import net.blacklab.lib.minecraft.vector.VectorUtil;
 import net.blacklab.lmr.achievements.AchievementsLMRE;
 import net.blacklab.lmr.entity.EntityLittleMaid;
-import net.blacklab.lmr.inventory.InventoryLittleMaid;
 import net.blacklab.lmr.util.EnumSound;
 import net.blacklab.lmr.util.TriggerSelect;
+import net.blacklab.lmr.util.VectorUtil;
 import net.blacklab.lmr.util.helper.MaidHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MaterialLiquid;
@@ -166,6 +165,7 @@ public class EntityMode_TorchLayer extends EntityModeBase {
 		}
 
 		int v = getBlockLighting(px, py, pz);
+
 		if (v < 8 && VectorUtil.canBlockBeSeen(owner, px, py - 1, pz, true, true, true) && !owner.isMaidWait()) {
 			if (owner.getNavigator().tryMoveToXYZ(px, py, pz, 1.0F) ) {
 				//owner.playLittleMaidSound(LMM_EnumSound.findTarget_D, true);

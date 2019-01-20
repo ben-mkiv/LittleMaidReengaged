@@ -8,7 +8,6 @@ import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.entity.experience.ExperienceUtil;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,10 +19,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ItemMaidPorter extends Item {
+	public final static String NAME = "maidporter";
+	public static ItemMaidPorter DEFAULT_ITEM;
+
 	public ItemMaidPorter() {
 		setMaxStackSize(1);
-		setUnlocalizedName(LittleMaidReengaged.DOMAIN + ":maidporter");
-		setRegistryName(getUnlocalizedName());
+		setUnlocalizedName(NAME);
+		setRegistryName(NAME);
 	}
 
 	@Override
@@ -35,8 +37,8 @@ public class ItemMaidPorter extends Item {
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		NBTTagCompound stackTag = stack.getTagCompound();
 		if (stackTag != null) {
-			String customName = stackTag.getString(LittleMaidReengaged.DOMAIN + ":MAID_NAME");
-			float experience = stackTag.getFloat(LittleMaidReengaged.DOMAIN + ":EXPERIENCE");
+			String customName = stackTag.getString(LittleMaidReengaged.MODID + ":MAID_NAME");
+			float experience = stackTag.getFloat(LittleMaidReengaged.MODID + ":EXPERIENCE");
 
 			if (!customName.isEmpty()) {
 				tooltip.add("Name: ".concat(customName));
@@ -55,8 +57,8 @@ public class ItemMaidPorter extends Item {
 		NBTTagCompound tagCompound = stack.getTagCompound();
 		if (tagCompound != null) {
 			if (worldIn.isAirBlock(pos.add(0, 1, 0)) && worldIn.isAirBlock(pos.add(0, 2, 0))) {
-				String customName = tagCompound.getString(LittleMaidReengaged.DOMAIN + ":MAID_NAME");
-				float experience = tagCompound.getFloat(LittleMaidReengaged.DOMAIN + ":EXPERIENCE");
+				String customName = tagCompound.getString(LittleMaidReengaged.MODID + ":MAID_NAME");
+				float experience = tagCompound.getFloat(LittleMaidReengaged.MODID + ":EXPERIENCE");
 
 				EntityLittleMaid lMaid = new EntityLittleMaid(worldIn) {
 					@Deprecated
@@ -73,11 +75,11 @@ public class ItemMaidPorter extends Item {
 					lMaid.setCustomNameTag(customName);
 				}
 				lMaid.maidInventory.clear();
-				lMaid.maidInventory.readFromNBT(tagCompound.getTagList(LittleMaidReengaged.DOMAIN + ":MAID_INVENTORY", 10));
+				lMaid.maidInventory.readFromNBT(tagCompound.getTagList(LittleMaidReengaged.MODID + ":MAID_INVENTORY", 10));
 
-				lMaid.setTextureNameMain(tagCompound.getString(LittleMaidReengaged.DOMAIN + ":MAIN_MODEL_NAME"));
-				lMaid.setTextureNameArmor(tagCompound.getString(LittleMaidReengaged.DOMAIN + ":ARMOR_MODEL_NAME"));
-				lMaid.setColor(tagCompound.getInteger(LittleMaidReengaged.DOMAIN + ":MAID_COLOR"));
+				lMaid.setTextureNameMain(tagCompound.getString(LittleMaidReengaged.MODID + ":MAIN_MODEL_NAME"));
+				lMaid.setTextureNameArmor(tagCompound.getString(LittleMaidReengaged.MODID + ":ARMOR_MODEL_NAME"));
+				lMaid.setColor(tagCompound.getInteger(LittleMaidReengaged.MODID + ":MAID_COLOR"));
 			} else {
 				return EnumActionResult.PASS;
 			}

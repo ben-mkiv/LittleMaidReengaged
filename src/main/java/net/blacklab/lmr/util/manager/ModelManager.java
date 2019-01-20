@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import net.blacklab.lib.classutil.FileClassUtil;
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.client.resource.OldZipTexturesWrapper;
 import net.blacklab.lmr.entity.maidmodel.IModelEntity;
@@ -28,12 +27,15 @@ import net.blacklab.lmr.entity.maidmodel.TextureBox;
 import net.blacklab.lmr.entity.maidmodel.TextureBoxBase;
 import net.blacklab.lmr.entity.maidmodel.TextureBoxServer;
 import net.blacklab.lmr.util.DevMode;
+import net.blacklab.lmr.util.FileClassUtil;
 import net.blacklab.lmr.util.FileList;
 import net.blacklab.lmr.util.helper.CommonHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
+
+import javax.annotation.Nonnull;
 
 public class ModelManager {
 
@@ -63,16 +65,16 @@ public class ModelManager {
 	 * 旧タイプのファイル名
 	 */
 	protected static String defNames[] = {
-		"mob_littlemaid0.png", "mob_littlemaid1.png",
-		"mob_littlemaid2.png", "mob_littlemaid3.png",
-		"mob_littlemaid4.png", "mob_littlemaid5.png",
-		"mob_littlemaid6.png", "mob_littlemaid7.png",
-		"mob_littlemaid8.png", "mob_littlemaid9.png",
-		"mob_littlemaida.png", "mob_littlemaidb.png",
-		"mob_littlemaidc.png", "mob_littlemaidd.png",
-		"mob_littlemaide.png", "mob_littlemaidf.png",
-		"mob_littlemaidw.png",
-		"mob_littlemaid_a00.png", "mob_littlemaid_a01.png"
+			"mob_littlemaid0.png", "mob_littlemaid1.png",
+			"mob_littlemaid2.png", "mob_littlemaid3.png",
+			"mob_littlemaid4.png", "mob_littlemaid5.png",
+			"mob_littlemaid6.png", "mob_littlemaid7.png",
+			"mob_littlemaid8.png", "mob_littlemaid9.png",
+			"mob_littlemaida.png", "mob_littlemaidb.png",
+			"mob_littlemaidc.png", "mob_littlemaidd.png",
+			"mob_littlemaide.png", "mob_littlemaidf.png",
+			"mob_littlemaidw.png",
+			"mob_littlemaid_a00.png", "mob_littlemaid_a01.png"
 	};
 
 	/**
@@ -182,7 +184,7 @@ public class ModelManager {
 		}
 		return null;
 	}
-	
+
 	private ModelMultiBase[] getModel(String pName) {
 		for (Entry<String, ModelMultiBase[]> le : modelMap.entrySet()) {
 			if (le.getKey().toLowerCase().equals(pName.toLowerCase())) {
@@ -223,6 +225,7 @@ public class ModelManager {
 			searchFiles(FileList.dirMods, lst);
 			if (DevMode.DEVMODE != DevMode.NOT_IN_DEV) {
 				searchFiles(FileList.dirDevClasses, lst);
+				searchFiles(FileList.dirDevClassAssets, lst);
 			}
 			if (DevMode.DEVMODE == DevMode.DEVMODE_ECLIPSE) {
 				for (File ln: FileList.dirDevIncludeClasses)
@@ -291,22 +294,20 @@ public class ModelManager {
 
 	private void searchFiles(File ln, String[] lst) {
 		LittleMaidReengaged.Debug("getTexture[%s:%s].", lst[0], lst[1]);
-		// mods
 		for (File lf : ln.listFiles()) {
-			boolean lflag;
 			if (lf.isDirectory()) {
-				// ディレクトリ
-				lflag = addTexturesDir(lf, lst);
-			} else {
-				// zip
-				lflag = addTexturesZip(lf, lst);
+				boolean lflag = addTexturesDir(lf, lst);
+				LittleMaidReengaged.Debug("getTexture-append-path '%s' [%s]", lf.toString(), lflag ? "done" : "fail");
+			} else if(lf.isFile()) {
+				boolean lflag = addTexturesZip(lf, lst);
+				LittleMaidReengaged.Debug("getTexture-append-file '%s' [%s]", lf.toString(), lflag ? "done" : "fail");
 			}
-			LittleMaidReengaged.Debug("getTexture-append-%s-%s.", lf.getName(), lflag ? "done" : "fail");
 		}
 	}
 
 	public void buildCrafterTexture() {
 		// TODO:実験コード標準モデルテクスチャで構築
+		// TODO: learn japanese ^_^
 		TextureBox lbox = new TextureBox("Crafter_Steve", new String[] {"", "", ""});
 		lbox.fileName = "";
 
@@ -443,7 +444,7 @@ public class ModelManager {
 				Class lclass;
 				if (lpackage != null) {
 //					cn = (new StringBuilder("")).append(".").append(cn).toString();
-					cn = cn.replace("/", ".");
+					cn = cn.replace("/", ".").replace("java.main.", "");
 					System.out.println("MMM_TextureManager.addModelClass : "+cn);
 					lclass = FileList.COMMON_CLASS_LOADER.loadClass(cn);
 				} else {
@@ -564,6 +565,7 @@ public class ModelManager {
 		try {
 			FileList.COMMON_CLASS_LOADER.addURL(file.toURI().toURL());
 		} catch (MalformedURLException e1) {
+			LittleMaidReengaged.Debug("malformed URL");
 		}
 
 		try {
@@ -594,16 +596,17 @@ public class ModelManager {
 						if (i > -1) {
 							// 対象はテクスチャディレクトリ
 							addTextureName(s.substring(i), pSearch);
-							if(DevMode.DEVMODE==DevMode.DEVMODE_ECLIPSE) for(File f:FileList.dirDevIncludeClasses){
-								String rin = FileClassUtil.getLinuxAntiDotName(f.getAbsolutePath());
-								if(tn.startsWith(rin)){
-									String cname = tn.substring(rin.length()+1);
-									String pr="assets/minecraft/";
-									if(cname.startsWith(pr)) cname=cname.substring(pr.length());
-									if(FMLCommonHandler.instance().getSide()==Side.CLIENT)
-										OldZipTexturesWrapper.keys.add(cname);
+							if(DevMode.DEVMODE==DevMode.DEVMODE_ECLIPSE)
+								for(File f:FileList.dirDevIncludeClasses){
+									String rin = FileClassUtil.getLinuxAntiDotName(f.getAbsolutePath());
+									if(tn.startsWith(rin)){
+										String cname = tn.substring(rin.length()+1);
+										String pr="assets/minecraft/";
+										if(cname.startsWith(pr)) cname=cname.substring(pr.length());
+										if(FMLCommonHandler.instance().getSide()==Side.CLIENT)
+											OldZipTexturesWrapper.keys.add(cname);
+									}
 								}
-							}
 //							addTextureName(s.substring(i).replace('\\', '/'));
 						}
 					} else {

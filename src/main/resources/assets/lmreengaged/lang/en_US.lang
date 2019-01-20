@@ -1,8 +1,7 @@
-entity.lmreengaged.LittleMaid.name=LittleMaid
+entity.littlemaid.name=LittleMaid
 
-item.lmreengaged:spawn_littlemaid_egg.name=Spawn LittleMaid
-item.lmreengaged:registerkey.name=§eTrigger Item Registerer
-item.lmreengaged:maidporter.name=Maid Porter
+item.registerkey.name=§eTrigger Item Registerer
+item.maidporter.name=Maid Porter
 
 achievement.contract=Realization
 achievement.contract.desc=Employ a LittleMaid
@@ -137,3 +136,5 @@ littleMaidMob.chat.text.timedeath=Your %s can no longer endure pain from %s
 
 system.lmmnx.chat.text.newversion=New version avaliable
 system.lmmnx.chat.text.checkversion=Go to: http://el-blacklab.net/
+
+itemGroup.lmreengaged=LittleMaid

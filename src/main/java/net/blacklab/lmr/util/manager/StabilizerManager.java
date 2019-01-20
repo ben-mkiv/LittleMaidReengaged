@@ -16,11 +16,10 @@ public class StabilizerManager extends ManagerBase {
 
 	public static final String preFix = "ModelStabilizer";
 	public static Map<String, ModelStabilizerBase> stabilizerList = new TreeMap<String, ModelStabilizerBase>();
-	
-	
+
+
 	public static void init() {
 		// 特定名称をプリフィックスに持つmodファイをを獲得
-		FileList.getModFile("Stabilizer", preFix);
 	}
 
 	public static void loadStabilizer() {
@@ -37,14 +36,14 @@ public class StabilizerManager extends ManagerBase {
 		if (!(ModelStabilizerBase.class).isAssignableFrom(pclass)) {
 			return false;
 		}
-		
+
 		try {
 			ModelStabilizerBase lms = (ModelStabilizerBase)pclass.newInstance();
 			stabilizerList.put(lms.getName(), lms);
 			return true;
 		} catch (Exception e) {
 		}
-		
+
 		return false;
 	}
 
@@ -55,12 +54,12 @@ public class StabilizerManager extends ManagerBase {
 		if (!stabilizerList.containsKey(pname)) {
 			return null;
 		}
-		
+
 		EquippedStabilizer lequip = new EquippedStabilizer();
 		lequip.stabilizer = stabilizerList.get(pname);
 		lequip.stabilizer.init(lequip);
 		lequip.equipPointName = pequippoint;
-		
+
 		return lequip;
 	}
 
