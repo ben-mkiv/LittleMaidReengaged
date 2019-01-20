@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.blacklab.lmr.config.Config;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -76,7 +77,7 @@ public class Transformer implements IClassTransformer, Opcodes {
 
 	public static void Debug(String pText, Object... pData) {
 		// デバッグメッセージ
-		if(LittleMaidReengaged.cfg_PrintDebugMessage)
+		if(Config.cfg_PrintDebugMessage)
 		{
 			System.out.println(String.format("Transformer-" + pText, pData));
 		}

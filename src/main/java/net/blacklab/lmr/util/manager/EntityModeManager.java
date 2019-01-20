@@ -7,6 +7,7 @@ import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.entity.mode.EntityModeBase;
 import net.blacklab.lmr.util.FileList;
+import org.apache.logging.log4j.Level;
 
 public class EntityModeManager extends ManagerBase {
 
@@ -79,9 +80,9 @@ public class EntityModeManager extends ManagerBase {
 	 * ロードされているモードリストを表示する。
 	 */
 	public static void showLoadedModes() {
-		LittleMaidReengaged.Debug("Loaded Entity Modes (%d)", maidModeList.size());
+		LittleMaidReengaged.Debug(Level.INFO, "Loaded Entity Modes (%d)", maidModeList.size());
 		for (EntityModeBase lem : maidModeList) {
-			LittleMaidReengaged.Debug("%04d : %s", lem.priority(), lem.getClass().getSimpleName());
+			LittleMaidReengaged.Debug(Level.INFO, "%04d : %s", lem.priority(), lem.getClass().getSimpleName());
 		}
 	}
 

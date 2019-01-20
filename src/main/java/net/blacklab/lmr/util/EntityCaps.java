@@ -7,11 +7,6 @@ import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 
-
-/**
- * Entityのデータ読み取り用のクラス
- * 別にEntityにインターフェース付けてもOK
- */
 public class EntityCaps extends EntityCapsLiving {
 
 	private EntityLittleMaid owner;
@@ -46,10 +41,7 @@ public class EntityCaps extends EntityCapsLiving {
 		caps.put("YOffset", caps_YOffset);
 		caps.put("mountedYOffset", caps_mountedYOffset);
 		caps.put("dominantArm", caps_dominantArm);
-//		caps.put("render", caps_render);
-//		caps.put("Arms", caps_Arms);
 		caps.put("HeadMount", caps_HeadMount);
-//		caps.put("HardPoint", caps_HardPoint);
 		caps.put("stabiliser", caps_stabiliser);
 		caps.put("Items", caps_Items);
 		caps.put("Actions", caps_Actions);
@@ -57,8 +49,6 @@ public class EntityCaps extends EntityCapsLiving {
 		caps.put("Ground", caps_Ground);
 		caps.put("Inventory", caps_Inventory);
 		caps.put("interestedAngle", caps_interestedAngle);
-//		caps.put("Entity", caps_Entity);
-//		caps.put("health", caps_health);
 		caps.put("currentArmor", caps_currentArmor);
 		caps.put("currentEquippedItem", caps_currentEquippedItem);
 	}
@@ -78,12 +68,6 @@ public class EntityCaps extends EntityCapsLiving {
 		int li = 0;
 
 		switch (pIndex) {
-//		case caps_Entity:
-//			return owner;
-//		case caps_health:
-//			return (int)owner.getHealth();
-//		case caps_healthFloat:
-//			return owner.getHealth();
 		case caps_isBloodsuck:
 			return owner.isBloodsuck();
 		case caps_isFreedom:
@@ -124,8 +108,6 @@ public class EntityCaps extends EntityCapsLiving {
 			return owner.getMaidOverDriveTime().isEnable();
 		case caps_isOverdriveDelay:
 			return owner.getMaidOverDriveTime().isDelay();
-		case caps_entityIdFactor:
-			return owner.entityIdFactor;
 		case caps_height:
 			return owner.textureData.textureBox[0] == null ? null : owner.textureData.textureBox[0].getHeight(this);
 		case caps_width:
@@ -136,14 +118,8 @@ public class EntityCaps extends EntityCapsLiving {
 			return owner.textureData.textureBox[0] == null ? null : owner.textureData.textureBox[0].getMountedYOffset(this);
 		case caps_dominantArm:
 			return owner.getDominantArm();
-//		case caps_mountedYOffset:
-//			return owner.textureModel0 == null ? null : owner.textureModel0.getHeight();
-//		case caps_render:
-//		case caps_Arms:
 		case caps_HeadMount:
-			// TODO 従来HeadMountとか使ってた部分は全部削除した方がすっきりすると思う．
 			return owner.maidInventory.armorInventory.get(3);
-//		case caps_HardPoint:
 		case caps_stabiliser:
 			return owner.maidStabilizer;
 		case caps_Items:
@@ -165,7 +141,6 @@ public class EntityCaps extends EntityCapsLiving {
 			}
 			return lgrounds;
 		case caps_Ground:
-			// float (int pIndex, int pDefVal)
 			if (owner.mstatSwingStatus.length < (Integer)pArg[0]) {
 				return pArg[1];
 			}
@@ -174,10 +149,6 @@ public class EntityCaps extends EntityCapsLiving {
 			return owner.maidInventory;
 		case caps_interestedAngle:
 			return owner.getInterestedAngle((Float)pArg[0]);
-//		case caps_currentArmor:
-//			return owner.getCurrentItemOrArmor((Integer)pArg[0] + 1);
-//		case caps_currentEquippedItem:
-//			return owner.getCurrentEquippedItem();
 		case caps_PartsVisible:
 			return owner.textureData.selectValue;
 		case caps_textureData:

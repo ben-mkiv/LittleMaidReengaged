@@ -9,6 +9,8 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
+import static net.blacklab.lmr.LittleMaidReengaged.MODID;
+
 public class TextureBox extends TextureBoxBase {
 
 	/**
@@ -210,12 +212,14 @@ public class TextureBox extends TextureBoxBase {
 
 		return lbox;
 	}
+
+	private static String formatTextureLocation(String input){
+		return input.replace("/assets/lmreengaged/", ""); //.replace(".png", "");
+	}
 	
 	public boolean addTexture(int pIndex, String pLocation) {
-		String ls = "/assets/minecraft/";
-		if (pLocation.startsWith(ls)) {
-			pLocation = pLocation.substring(ls.length());
-		}
+		pLocation = formatTextureLocation(pLocation);
+
 		boolean lflag = false;
 		switch ((pIndex & 0xfff0)) {
 		case ModelManager.tx_armor1:
@@ -224,7 +228,7 @@ public class TextureBox extends TextureBoxBase {
 		case ModelManager.tx_armor2light:
 		case ModelManager.tx_oldarmor1:
 		case ModelManager.tx_oldarmor2:
-			ls = pLocation.substring(pLocation.lastIndexOf("/") + 1, pLocation.lastIndexOf("_"));
+			String ls = pLocation.substring(pLocation.lastIndexOf("/") + 1, pLocation.lastIndexOf("_"));
 			Map<Integer, ResourceLocation> lmap;
 			if (armors.containsKey(ls)) {
 				lmap = armors.get(ls);
@@ -232,11 +236,11 @@ public class TextureBox extends TextureBoxBase {
 				lmap = new HashMap<Integer, ResourceLocation>();
 				armors.put(ls, lmap);
 			}
-			lmap.put(pIndex, new ResourceLocation(pLocation));
+			lmap.put(pIndex, new ResourceLocation(MODID, pLocation));
 			break;
 
 		default:
-			textures.put(pIndex, new ResourceLocation(pLocation));
+			textures.put(pIndex, new ResourceLocation(MODID, pLocation));
 			return true;
 		}
 		return lflag;

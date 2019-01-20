@@ -2,6 +2,7 @@ package net.blacklab.lmr.entity.maidmodel;
 
 import java.util.Map;
 
+import net.blacklab.lmr.config.Config;
 import org.lwjgl.opengl.GL11;
 
 import net.blacklab.lmr.LittleMaidReengaged;
@@ -48,7 +49,7 @@ public class ModelBaseSolo extends ModelBaseNihil implements IModelBaseMMM {
 			return;
 		}
 		if (isAlphablend) {
-			if (LittleMaidReengaged.cfg_isModelAlphaBlend) {
+			if (Config.cfg_isModelAlphaBlend) {
 				GL11.glEnable(GL11.GL_BLEND);
 				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			} else {

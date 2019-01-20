@@ -1,8 +1,10 @@
 package net.blacklab.lmr.network;
 
+import net.blacklab.lmr.LittleMaidReengaged;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 public class ProxyCommon
 {
@@ -28,5 +30,9 @@ public class ProxyCommon
 	}
 	public Object getClientGuiElement(int iD, EntityPlayer player, World world, int x, int y, int z) {
 		return null;
+	}
+
+	public void printEntitySpawnBiomeRegistrationInfo(String name, Biome biome){
+		LittleMaidReengaged.Debug("Registering "+name+" to spawn in " + biome.getRegistryName());
 	}
 }

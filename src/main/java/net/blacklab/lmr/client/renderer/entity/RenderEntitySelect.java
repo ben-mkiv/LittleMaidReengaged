@@ -1,8 +1,8 @@
 package net.blacklab.lmr.client.renderer.entity;
 
+import net.blacklab.lmr.config.Config;
 import org.lwjgl.opengl.GL11;
 
-import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.client.entity.EntityLittleMaidForTexSelect;
 import net.blacklab.lmr.entity.maidmodel.IModelEntity;
 import net.blacklab.lmr.entity.maidmodel.ModelBaseDuo;
@@ -25,21 +25,12 @@ public class RenderEntitySelect extends RenderModelMulti {
 
 		public RenderLivingBase p1;
 		public ModelBaseDuo mmodel;
-		public RenderLivingBase field_177190_a;
-		public float field_177184_f;
-		public float field_177185_g;
-		public float field_177192_h;
-		public float field_177187_e;
-		public boolean field_177193_i;
 		public EntityLittleMaidForTexSelect lmm;
-		private int renderCount;
 
 		public MMMLayerArmor(RenderLivingBase p_i46125_1_) {
 			super(p_i46125_1_);
 			p1 = p_i46125_1_;
 			mmodel = modelFATT;
-//			this.modelLeggings = mmodel;
-//			this.modelArmor = mmodel;
 		}
 
 		@Override
@@ -77,20 +68,15 @@ public class RenderEntitySelect extends RenderModelMulti {
 				mmodel.textureOuter = ltentity.getTextures(2);
 				mmodel.textureInnerLight = ltentity.getTextures(3);
 				mmodel.textureOuterLight = ltentity.getTextures(4);
-//				mmodel.textureLightColor = (float[])modelFATT.getCapsValue(IModelCaps.caps_textureLightColor, pEntityCaps);
-//				mmodel.entityCaps = lmm.maidCaps;
 			}
-//			mmodel.setEntityCaps(pEntityCaps);
 			mmodel.setRender(RenderEntitySelect.this);
 			mmodel.showAllParts();
 			mmodel.isAlphablend = true;
 		}
 
 		public void render(Entity par1Entity, float par2, float par3, float par4, float par5, float par6, float par7, int renderParts) {
-			//初回のみ指定値設定
-			/*if(renderCount==0) */this.setModelValues(lmm);
+			this.setModelValues(lmm);
 
-			//総合
 			mmodel.showArmorParts(renderParts);
 
 			//Inner
@@ -108,23 +94,23 @@ public class RenderEntitySelect extends RenderModelMulti {
 			}
 
 			// 発光Inner
-			INNERLIGHT: if (renderCount == 0 && mmodel.modelInner!=null) {
+			INNERLIGHT: if (mmodel.modelInner!=null) {
 				ResourceLocation texInnerLight = mmodel.textureInnerLight[renderParts];
 				if (texInnerLight != null) {
 					try{
 						Minecraft.getMinecraft().getTextureManager().bindTexture(texInnerLight);
 					}catch(Exception e){ break INNERLIGHT; }
-					GL11.glEnable(GL11.GL_BLEND);
-					GL11.glEnable(GL11.GL_ALPHA_TEST);
-					GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
-					GL11.glDepthFunc(GL11.GL_LEQUAL);
+					GlStateManager.enableBlend();
+					GlStateManager.enableAlpha();
+					GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
+					GlStateManager.depthFunc(GL11.GL_LEQUAL);
 
 					RendererHelper.setLightmapTextureCoords(0x00f000f0);//61680
 					if (mmodel.textureLightColor == null) {
-						GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+						GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 					} else {
 						//発光色を調整
-						GL11.glColor4f(
+						GlStateManager.color(
 								mmodel.textureLightColor[0],
 								mmodel.textureLightColor[1],
 								mmodel.textureLightColor[2],
@@ -132,15 +118,15 @@ public class RenderEntitySelect extends RenderModelMulti {
 					}
 					mmodel.modelInner.mainFrame.render(0.0625F);
 					RendererHelper.setLightmapTextureCoords(mmodel.lighting);
-					GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-					GL11.glDisable(GL11.GL_BLEND);
-					GL11.glDisable(GL11.GL_ALPHA_TEST);
-//					GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+					GlStateManager.disableBlend();
+					GlStateManager.disableAlpha();
+					//GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				}
 			}
 
 			//Outer
-			if(LittleMaidReengaged.cfg_isModelAlphaBlend) GL11.glEnable(GL11.GL_BLEND);
+			if(Config.cfg_isModelAlphaBlend) GL11.glEnable(GL11.GL_BLEND);
 			OUTER:{
 				if(mmodel.modelOuter==null) break OUTER;
 				GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -150,30 +136,27 @@ public class RenderEntitySelect extends RenderModelMulti {
 					Minecraft.getMinecraft().getTextureManager().bindTexture(texOuter);
 				}catch(Exception e){}
 
-//				mmodel.modelOuter.setLivingAnimations(lmm.maidCaps, par2, par3, lmm.ticksExisted);
-//				mmodel.modelOuter.setRotationAngles(par2, par3, lmm.ticksExisted, par5, par6, 0.0625F, lmm.maidCaps);
 				mmodel.modelOuter.mainFrame.render(0.0625F);
-				//mmodel.modelOuter.mainFrame.render(0.0625F, true);
 			}
 
 			// 発光Outer
-			OUTERLIGHT: if (renderCount == 0 && mmodel.modelOuter!=null) {
+			OUTERLIGHT: if (mmodel.modelOuter!=null) {
 				ResourceLocation texOuterLight = mmodel.textureOuterLight[renderParts];
 				if (texOuterLight != null) {
 					try{
 						Minecraft.getMinecraft().getTextureManager().bindTexture(texOuterLight);
 					}catch(Exception e){ break OUTERLIGHT; }
-					GL11.glEnable(GL11.GL_BLEND);
-					GL11.glEnable(GL11.GL_ALPHA_TEST);
-					GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
-					GL11.glDepthFunc(GL11.GL_LEQUAL);
+					GlStateManager.enableBlend();
+					GlStateManager.enableAlpha();
+					GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
+					GlStateManager.depthFunc(GL11.GL_LEQUAL);
 
 					RendererHelper.setLightmapTextureCoords(0x00f000f0);//61680
 					if (mmodel.textureLightColor == null) {
-						GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+						GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 					} else {
 						//発光色を調整
-						GL11.glColor4f(
+						GlStateManager.color(
 								mmodel.textureLightColor[0],
 								mmodel.textureLightColor[1],
 								mmodel.textureLightColor[2],
@@ -181,11 +164,11 @@ public class RenderEntitySelect extends RenderModelMulti {
 					}
 					mmodel.modelOuter.mainFrame.render(0.0625F);
 					RendererHelper.setLightmapTextureCoords(mmodel.lighting);
-					GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-					GL11.glDisable(GL11.GL_BLEND);
-					GL11.glDisable(GL11.GL_ALPHA_TEST);
+					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+					GlStateManager.disableBlend();
+					GlStateManager.disableAlpha();
 				}
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+				GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			}
 
 			//カウントインクリメント

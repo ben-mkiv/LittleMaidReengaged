@@ -2,12 +2,12 @@ package net.blacklab.lmr.client.renderer.entity;
 
 import java.util.Iterator;
 
+import net.minecraft.client.renderer.texture.TextureMap;
 import org.lwjgl.opengl.GL11;
 
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.entity.maidmodel.IModelCaps;
 import net.blacklab.lmr.entity.maidmodel.ModelBaseDuo;
-import net.blacklab.lmr.inventory.InventoryLittleMaid;
 import net.blacklab.lmr.util.helper.RendererHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
@@ -26,7 +26,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class RenderLittleMaid extends RenderModelMulti {
 
-	// Method
 	public RenderLittleMaid(RenderManager manager,float f) {
 		super(manager,f);
 
@@ -34,20 +33,8 @@ public class RenderLittleMaid extends RenderModelMulti {
 		addLayer(new MMMLayerArmor(this));
 	}
 
-	/**
-	 * 防具描画レイヤー
-	 */
 	public class MMMLayerArmor extends LayerArmorBase{
-
-		//レイヤーと化した防具描画
-
 		public RenderLivingBase p1;
-		public RenderLivingBase field_177190_a;
-		public float field_177184_f;
-		public float field_177185_g;
-		public float field_177192_h;
-		public float field_177187_e;
-		public boolean field_177193_i;
 		public EntityLittleMaid lmm;
 
 		public static final float renderScale = 0.0625F;
@@ -55,13 +42,10 @@ public class RenderLittleMaid extends RenderModelMulti {
 		public MMMLayerArmor(RenderLivingBase p_i46125_1_) {
 			super(p_i46125_1_);
 			p1 = p_i46125_1_;
-//			this.modelLeggings = mmodel;
-//			this.modelArmor = mmodel;
 		}
 
 		@Override
-		protected void initArmor() {
-		}
+		protected void initArmor() {}
 
 		@Override
 		protected void setModelSlotVisible(ModelBase paramModelBase, EntityEquipmentSlot paramInt) {
@@ -73,12 +57,14 @@ public class RenderLittleMaid extends RenderModelMulti {
 		public void doRenderLayer(EntityLivingBase par1EntityLiving, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 			lmm = (EntityLittleMaid) par1EntityLiving;
 
-			for (int i=0; i<4; i++) {
-				if (!lmm.maidInventory.armorItemInSlot(i).isEmpty()) {
-					render(par1EntityLiving, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, i);
-				}
+			for(int armorItemIndex=0; armorItemIndex<4; armorItemIndex++) {
+				if (lmm.maidInventory.armorItemInSlot(armorItemIndex).isEmpty())
+					continue;
+
+				render(par1EntityLiving, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, armorItemIndex);
 			}
 		}
+
 
 		public void render(EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, int renderParts) {
 //			boolean lri = (renderCount & 0x0f) == 0;
@@ -91,8 +77,8 @@ public class RenderLittleMaid extends RenderModelMulti {
 					ResourceLocation texInner = modelFATT.textureInner[renderParts];
 					if(texInner!=null&&lmm.isArmorVisible(0)) try{
 						Minecraft.getMinecraft().getTextureManager().bindTexture(texInner);
-						GL11.glEnable(GL11.GL_BLEND);
-						GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+						GlStateManager.enableBlend();
+						GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 						modelFATT.modelInner.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, renderScale, fcaps);
 						modelFATT.modelInner.setLivingAnimations(fcaps, limbSwing, limbSwingAmount, partialTicks);
 						modelFATT.modelInner.render(fcaps, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, renderScale, true);
@@ -108,17 +94,17 @@ public class RenderLittleMaid extends RenderModelMulti {
 				if (texInnerLight != null&&lmm.isArmorVisible(1)) {
 					try{
 						Minecraft.getMinecraft().getTextureManager().bindTexture(texInnerLight);
-						GL11.glEnable(GL11.GL_BLEND);
-						GL11.glDisable(GL11.GL_ALPHA_TEST);
-						GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
-						GL11.glDepthFunc(GL11.GL_LEQUAL);
+						GlStateManager.enableBlend();
+						GlStateManager.disableAlpha();
+						GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
+						GlStateManager.depthFunc(GL11.GL_LEQUAL);
 
 						RendererHelper.setLightmapTextureCoords(0x00f000f0);//61680
 						if (modelFATT.textureLightColor == null) {
-							GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+							GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 						} else {
 							//発光色を調整
-							GL11.glColor4f(
+							GlStateManager.color(
 									modelFATT.textureLightColor[0],
 									modelFATT.textureLightColor[1],
 									modelFATT.textureLightColor[2],
@@ -126,9 +112,9 @@ public class RenderLittleMaid extends RenderModelMulti {
 						}
 						modelFATT.modelInner.render(fcaps, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, renderScale, true);
 						RendererHelper.setLightmapTextureCoords(modelFATT.lighting);
-						GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-						GL11.glDisable(GL11.GL_BLEND);
-						GL11.glEnable(GL11.GL_ALPHA_TEST);
+						GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+						GlStateManager.disableBlend();
+						GlStateManager.enableAlpha();
 					}catch(Exception e){ break INNERLIGHT; }
 				}
 			}
@@ -141,8 +127,8 @@ public class RenderLittleMaid extends RenderModelMulti {
 					ResourceLocation texOuter = modelFATT.textureOuter[renderParts];
 					if(texOuter!=null&&lmm.isArmorVisible(2)) try{
 						Minecraft.getMinecraft().getTextureManager().bindTexture(texOuter);
-						GL11.glEnable(GL11.GL_BLEND);
-						GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+						GlStateManager.enableBlend();
+						GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 						modelFATT.modelOuter.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, renderScale, fcaps);
 						modelFATT.modelOuter.setLivingAnimations(fcaps, limbSwing, limbSwingAmount, partialTicks);
 						modelFATT.modelOuter.render(fcaps, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, renderScale, true);
@@ -158,17 +144,17 @@ public class RenderLittleMaid extends RenderModelMulti {
 				if (texOuterLight != null&&lmm.isArmorVisible(3)) {
 					try{
 						Minecraft.getMinecraft().getTextureManager().bindTexture(texOuterLight);
-						GL11.glEnable(GL11.GL_BLEND);
-						GL11.glEnable(GL11.GL_ALPHA_TEST);
-						GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
-						GL11.glDepthFunc(GL11.GL_LEQUAL);
+						GlStateManager.enableBlend();
+						GlStateManager.enableAlpha();
+						GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
+						GlStateManager.depthFunc(GL11.GL_LEQUAL);
 
 						RendererHelper.setLightmapTextureCoords(0x00f000f0);//61680
 						if (modelFATT.textureLightColor == null) {
-							GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+							GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 						} else {
 							//発光色を調整
-							GL11.glColor4f(
+							GlStateManager.color(
 									modelFATT.textureLightColor[0],
 									modelFATT.textureLightColor[1],
 									modelFATT.textureLightColor[2],
@@ -176,13 +162,13 @@ public class RenderLittleMaid extends RenderModelMulti {
 						}
 						if(lmm.isArmorVisible(1)) modelFATT.modelOuter.render(fcaps, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, renderScale, true);
 						RendererHelper.setLightmapTextureCoords(modelFATT.lighting);
-						GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-						GL11.glDisable(GL11.GL_BLEND);
-						GL11.glEnable(GL11.GL_ALPHA_TEST);
+						GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+						GlStateManager.disableBlend();
+						GlStateManager.enableAlpha();
 					}catch(Exception e){ break OUTERLIGHT; }
-					GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+					GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				}
-			}
+			}			
 		}
 	}
 
@@ -275,7 +261,6 @@ public class RenderLittleMaid extends RenderModelMulti {
 		modelMain.setCapsValue(IModelCaps.caps_aimedBow, lmaid.isAimebow());
 		modelMain.setCapsValue(IModelCaps.caps_isWait, lmaid.isMaidWait());
 		modelMain.setCapsValue(IModelCaps.caps_isChild, lmaid.isChild());
-		modelMain.setCapsValue(IModelCaps.caps_entityIdFactor, lmaid.entityIdFactor);
 		modelMain.setCapsValue(IModelCaps.caps_ticksExisted, lmaid.ticksExisted);
 		modelMain.setCapsValue(IModelCaps.caps_dominantArm, lmaid.getDominantArm());
 		modelFATT.setModelAttributes(mainModel);

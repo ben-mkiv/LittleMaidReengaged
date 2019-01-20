@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import net.blacklab.lmr.util.DevMode;
 import net.blacklab.lmr.util.FileClassUtil;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.logging.log4j.Level;
@@ -68,7 +68,13 @@ public class SoundLoader {
 			}
 		}
 
+		if(!DevMode.DEVMODE.equals(DevMode.NOT_IN_DEV)){
+			instance.searchDir(FileList.dirDevClassAssets);
+		}
+
 		instance.searchDir(FileList.dirMods);
+
+
 		SoundRegistry.copySoundsAdjust();
 		instance.appendPath();
 		instance.createJson();
@@ -84,10 +90,10 @@ public class SoundLoader {
 			if (t.isDirectory()) {
 				searchDir(t);
 			}
-			if (t.getName().endsWith(".zip")) {
+			else if (t.getName().endsWith(".zip")) {
 				searchZip(t, Charset.forName("UTF-8"));
 			}
-			if (t.getName().endsWith(".ogg")) {
+			else if (t.getName().endsWith(".ogg")) {
 				String c1 = FileClassUtil.getLinuxAntiDotName(t.getAbsolutePath());
 				String c2 = FileClassUtil.getLinuxAntiDotName(FileList.dirMods.getAbsolutePath());
 				String p = c1.substring(c2.length());
@@ -252,7 +258,7 @@ public class SoundLoader {
 		}
 		if (!jsonDir.exists()) {
 			if (!jsonDir.mkdir()) {
-				FMLLog.log(Level.ERROR, "[LittleMaidReengaged]Making LittleMaidReengaged directory failed.");
+				LittleMaidReengaged.Debug(Level.ERROR, "[LittleMaidReengaged]Making LittleMaidReengaged directory failed.");
 				found = false;
 				return;
 			}
@@ -261,7 +267,7 @@ public class SoundLoader {
 		// JSON書き込み
 		File jsonFile = new File(jsonDir, "sounds.json");
 		if (jsonFile.isDirectory()) {
-			FMLLog.log(Level.ERROR, "[LittleMaidReengaged]There is sounds.json folder?");
+			LittleMaidReengaged.Debug(Level.ERROR, "[LittleMaidReengaged]There is sounds.json folder?");
 			found = false;
 			return;
 		}

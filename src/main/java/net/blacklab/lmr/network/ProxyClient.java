@@ -3,34 +3,23 @@ package net.blacklab.lmr.network;
 import java.util.Arrays;
 
 import net.blacklab.lmr.LittleMaidReengaged;
-import net.blacklab.lmr.client.entity.EntityLittleMaidForTexSelect;
 import net.blacklab.lmr.client.gui.GuiIFF;
 import net.blacklab.lmr.client.gui.inventory.GuiMaidInventory;
 import net.blacklab.lmr.client.resource.OldZipTexturesWrapper;
 import net.blacklab.lmr.client.resource.SoundResourcePack;
 import net.blacklab.lmr.client.sound.SoundLoader;
 import net.blacklab.lmr.entity.EntityLittleMaid;
-import net.blacklab.lmr.entity.EntityMarkerDummy;
-import net.blacklab.lmr.entity.renderfactory.RenderFactoryLittleMaid;
-import net.blacklab.lmr.entity.renderfactory.RenderFactoryMarkerDummy;
-import net.blacklab.lmr.entity.renderfactory.RenderFactoryModelSelect;
-import net.blacklab.lmr.item.ItemMaidPorter;
-import net.blacklab.lmr.item.ItemTriggerRegisterKey;
 import net.blacklab.lmr.util.EnumSound;
 import net.blacklab.lmr.util.IFF;
 import net.blacklab.lmr.util.helper.CommonHelper;
 import net.blacklab.lmr.util.helper.NetworkHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleItemPickup;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraft.world.biome.Biome;
 
 /**
  * クライアント専用処理。
@@ -228,5 +217,9 @@ public class ProxyClient extends ProxyCommon {
 		public void cancel(){
 			isRunning = false;
 		}
+	}
+
+	public void printEntitySpawnBiomeRegistrationInfo(String name, Biome biome){
+		LittleMaidReengaged.Debug("Registering "+ name +" to spawn in " + biome.getBiomeName());
 	}
 }

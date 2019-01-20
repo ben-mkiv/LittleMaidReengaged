@@ -1,8 +1,6 @@
 package net.blacklab.lmr.entity.ai;
 
 import net.blacklab.lmr.entity.EntityLittleMaid;
-import net.blacklab.lmr.entity.EntityMarkerDummy;
-import net.blacklab.lmr.entity.mode.EntityModeBase;
 import net.blacklab.lmr.util.helper.MaidHelper;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.tileentity.TileEntity;
@@ -13,24 +11,17 @@ public class EntityAILMFindBlock extends EntityAIBase implements IEntityAI {
 
 	protected boolean isEnable;
 	protected EntityLittleMaid theMaid;
-//	protected MovingObjectPosition theBlock;
-//	protected int tileY;
-//	protected int tileZ;
-//	protected boolean isFind;
 	
 	
 	public EntityAILMFindBlock(EntityLittleMaid pEntityLittleMaid) {
 		theMaid = pEntityLittleMaid;
 		isEnable = true;
-//		theBlock = null;
 		
 		setMutexBits(3);
 	}
 	
 	@Override
 	public boolean shouldExecute() {
-//		LMM_EntityModeBase llmode = theMaid.getActiveModeClass();
-//		if (!isEnable || theMaid.isWait() || theMaid.getActiveModeClass() == null || !theMaid.getActiveModeClass().isSearchBlock() || theMaid.getCurrentEquippedItem() == null) {
 		if (!isEnable || theMaid.isMaidWait() || theMaid.getMaidActiveModeClass() == null) {
 			return false;
 		}
@@ -46,11 +37,7 @@ public class EntityAILMFindBlock extends EntityAIBase implements IEntityAI {
 		int xx = lx;
 		int yy = ly;
 		int zz = lz;
-		
-		// TODO:Dummy
-		EntityMarkerDummy.clearDummyEntity(theMaid);
-		boolean flagdammy = false;
-		
+
 		// CW方向に検索領域を広げる 
 		for (int d = 0; d < 4; d++) {
 			for (int a = 0; a < 18; a += 2) {
@@ -71,11 +58,7 @@ public class EntityAILMFindBlock extends EntityAIBase implements IEntityAI {
 					xx = lx - del;
 					zz = lz + del;
 				}
-				// TODO:Dummay
-				if (!flagdammy) {
-					EntityMarkerDummy.setDummyEntity(theMaid, 0x00ff4f4f, xx, ly, zz);
-					flagdammy = true;
-				}
+
 				int b = 0;
 				do {
 					for (int c = 0; c < 3; c++) {
@@ -83,21 +66,10 @@ public class EntityAILMFindBlock extends EntityAIBase implements IEntityAI {
 						if (theMaid.getMaidActiveModeClass().checkBlock(theMaid.maidMode, xx, yy, zz)) {
 							if (theMaid.getMaidActiveModeClass().outrangeBlock(theMaid.maidMode, xx, yy, zz)) {
 								theMaid.setTilePos(xx, yy, zz);
-								// TODO:Dummay
-								EntityMarkerDummy.setDummyEntity(theMaid, 0x004fff4f, xx, yy, zz);
-								flagdammy = true;
-								return true;
 							}
 						}
 					}
-					// TODO:Dummay
-					if (!flagdammy) {
-						EntityMarkerDummy.setDummyEntity(theMaid, 0x00ffffcf, xx, ly, zz);
-						flagdammy = true;
-					}
-					// TODO:dammy
-					flagdammy = false;
-					
+
 					if (vt == 0) {
 						xx++;
 					} 
@@ -121,9 +93,6 @@ public class EntityAILMFindBlock extends EntityAIBase implements IEntityAI {
 				lx = ltile.getPos().getX();
 				ly = ltile.getPos().getY();
 				lz = ltile.getPos().getZ();
-				// TODO:Dummay
-				EntityMarkerDummy.setDummyEntity(theMaid, 0x004fff4f, lx, ly, lz);
-				flagdammy = true;
 			}
 			return true;
 		}
@@ -164,7 +133,6 @@ public class EntityAILMFindBlock extends EntityAIBase implements IEntityAI {
 
 	@Override
 	public void updateTask() {
-		// ターゲットを見つけている
 		theMaid.looksTilePos();
 	}
 

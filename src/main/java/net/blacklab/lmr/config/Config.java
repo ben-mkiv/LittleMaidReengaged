@@ -25,11 +25,71 @@ public class Config extends PermissionAPI {
 
     static HashMap<String, Property> configOptions = new HashMap<>();
 
-    public static void preInit(){
+    // @MLProp(info="Relative spawn weight. The lower the less common. 10=pigs. 0=off")
+    public static int cfg_spawnWeight = 5;
+    // @MLProp(info="Maximum spawn count in the World.")
+    public static int cfg_spawnLimit = 20;
+    // @MLProp(info="Minimum spawn group count.")
+    public static int cfg_minGroupSize = 1;
+    // @MLProp(info="Maximum spawn group count.")
+    public static int cfg_maxGroupSize = 3;
+    // @MLProp(info="It will despawn, if it lets things go. ")
+    public static boolean cfg_canDespawn = false;
+    // @MLProp(info="At local, make sure the name of the owner. ")
+    public static boolean cfg_checkOwnerName = false;
+    // @MLProp(info="Not to survive the doppelganger. ")
+    public static boolean cfg_antiDoppelganger = true;
+    // @MLProp(info="Enable LMM SpawnEgg Recipe. ")
+    public static boolean cfg_enableSpawnEgg = true;
+
+    // @MLProp(info="LittleMaid Voice distortion.")
+    public static boolean cfg_VoiceDistortion = false;
+
+    // @MLProp(info="Print Debug Massages.")
+    public static boolean cfg_PrintDebugMessage = false;
+    // @MLProp(info="Print Death Massages.")
+    public static boolean cfg_DeathMessage = true;
+    // @MLProp(info="Spawn Anywhere.")
+    public static boolean cfg_Dominant = false;
+    // アルファブレンド
+    public static boolean cfg_isModelAlphaBlend = false;
+    // 野生テクスチャ
+    public static boolean cfg_isFixedWildMaid = false;
+
+    // LivingSoundRate
+    public static double cfg_voiceRate = 0.1d;
+
+    public static boolean cfg_Aggressive = true;
+    public static int cfg_maidOverdriveDelay = 64;
+
+
+    public static void init(){
         File configFile = new File(Loader.instance().getConfigDir(), LittleMaidReengaged.MODID + ".cfg");
         config = new Configuration(configFile);
 
         syncConfig(true);
+
+        cfg_Aggressive = getConfig().getCategory("general").get("Aggressive").getBoolean();
+        cfg_antiDoppelganger = getConfig().getCategory("general").get("antiDoppelganger").getBoolean();
+        cfg_canDespawn = getConfig().getCategory("general").get("canDespawn").getBoolean();
+        cfg_checkOwnerName = getConfig().getCategory("general").get("checkOwnerName").getBoolean();
+        cfg_DeathMessage = getConfig().getCategory("general").get("DeathMessage").getBoolean();
+
+        cfg_VoiceDistortion = getConfig().getCategory("general").get("VoiceDistortion").getBoolean();
+        cfg_Dominant = getConfig().getCategory("general").get("Dominant").getBoolean();
+        cfg_enableSpawnEgg = getConfig().getCategory("general").get("enableSpawnEgg").getBoolean();
+
+        cfg_maxGroupSize = getConfig().getCategory("general").get("maxGroupSize").getInt();
+        cfg_minGroupSize = getConfig().getCategory("general").get("minGroupSize").getInt();
+        cfg_spawnLimit = getConfig().getCategory("general").get("spawnLimit").getInt();
+        cfg_spawnWeight = getConfig().getCategory("general").get("spawnWeight").getInt();
+
+        cfg_PrintDebugMessage = getConfig().getCategory("general").get("PrintDebugMessage").getBoolean();
+        cfg_isModelAlphaBlend = getConfig().getCategory("general").get("isModelAlphaBlend").getBoolean();
+        cfg_isFixedWildMaid = getConfig().getCategory("general").get("isFixedWildMaid").getBoolean();
+
+        cfg_voiceRate = getConfig().getCategory("general").get("voiceRate").getDouble();
+        cfg_maidOverdriveDelay = getConfig().getCategory("general").get("maidOverdriveDelay").getInt();        
     }
 
     public static void clientPreInit() {

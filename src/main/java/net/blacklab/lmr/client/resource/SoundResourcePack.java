@@ -54,7 +54,7 @@ public class SoundResourcePack implements IResourcePack {
 	public boolean resourceExists(ResourceLocation resource) {
 		LittleMaidReengaged.Debug("RESOURCE CHECK %s", resource.getResourcePath());
 		if (resource.getResourcePath().endsWith("sounds.json")) {
-			return true;
+			return getResourceStream(resource) != null;
 		}
 		if (resource.getResourcePath().endsWith(".ogg")) {
 			String f = decodePathGetName(resource);

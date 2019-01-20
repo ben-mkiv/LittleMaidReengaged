@@ -2,6 +2,7 @@ package net.blacklab.lmr.event;
 
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.client.entity.EntityLittleMaidAvatarSP;
+import net.blacklab.lmr.config.Config;
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.entity.EntityLittleMaidAvatarMP;
 import net.blacklab.lmr.entity.IEntityLittleMaidAvatar;
@@ -105,7 +106,7 @@ public class EventHookLMRE
 
 	public static boolean deleteDoppelganger(boolean loading, World world, Entity entity) {
 		// ドッペル対策
-		if (LittleMaidReengaged.cfg_antiDoppelganger/* && maidAnniversary > 0L*/) {
+		if (Config.cfg_antiDoppelganger/* && maidAnniversary > 0L*/) {
 			for (int i = 0; i < world.loadedEntityList.size(); i++) {
 				Entity entity1 = (Entity)world.loadedEntityList.get(i);
 

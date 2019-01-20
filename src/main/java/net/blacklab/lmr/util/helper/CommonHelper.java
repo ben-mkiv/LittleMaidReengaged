@@ -89,8 +89,8 @@ public class CommonHelper {
 		return lam == null ? 0 : lam.getAmount();
 	}
 
-	public static GameProfile newGameProfile(String UUIDid, String name) {
-		return new GameProfile(UUID.randomUUID(), name);
+	public static GameProfile newGameProfile(UUID UUIDid, String name) {
+		return new GameProfile(UUIDid, name);
 	}
 
 	public static void notifyAdmins(ICommandSender sender, ICommand cmd, int p_152374_2_, String s, Object ... p_152374_4_) {

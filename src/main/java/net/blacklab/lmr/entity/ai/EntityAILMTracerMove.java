@@ -1,7 +1,6 @@
 package net.blacklab.lmr.entity.ai;
 
 import net.blacklab.lmr.entity.EntityLittleMaid;
-import net.blacklab.lmr.entity.EntityMarkerDummy;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -69,8 +68,7 @@ public class EntityAILMTracerMove extends EntityAIBase implements IEntityAI {
 		int zz = oz;
 		double lrange = Double.MAX_VALUE;
 
-		// TODO:Dummy
-		EntityMarkerDummy.clearDummyEntity(theMaid);
+
 		boolean flagdammy = false;
 
 		// CW方向に検索領域を広げる
@@ -93,11 +91,7 @@ public class EntityAILMTracerMove extends EntityAIBase implements IEntityAI {
 					xx = ox - del;
 					zz = oz + del;
 				}
-				// TODO:Dummay
-				if (!flagdammy) {
-					EntityMarkerDummy.setDummyEntity(theMaid, 0x00ff4f4f, xx, oy, zz);
-					flagdammy = true;
-				}
+
 				int b = 0;
 				do {
 					for (int c = 0; c < 3; c++) {
@@ -113,24 +107,11 @@ public class EntityAILMTracerMove extends EntityAIBase implements IEntityAI {
 									tileZ = zz;
 //									theMaid.func_110171_b(xx, yy, zz, 16);
 									theMaid.setHomePosAndDistance(new BlockPos(xx, yy, zz), -1);
-									// TODO:Dummy
-									EntityMarkerDummy.setDummyEntity(theMaid, 0x004f4fff, xx, yy, zz);
-									flagdammy = true;
 									return;
 								}
 							}
-							// TODO:Dummay
-							EntityMarkerDummy.setDummyEntity(theMaid, 0x004fff4f, xx, yy, zz);
-							flagdammy = true;
 						}
 					}
-					// TODO:Dummay
-					if (!flagdammy) {
-						EntityMarkerDummy.setDummyEntity(theMaid, 0x00ffffcf, xx, oy, zz);
-						flagdammy = true;
-					}
-					// TODO:dammy
-					flagdammy = false;
 
 					if (vt == 0) {
 						xx++;

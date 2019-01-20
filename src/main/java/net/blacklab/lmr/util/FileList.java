@@ -2,6 +2,7 @@ package net.blacklab.lmr.util;
 
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -67,6 +68,26 @@ public class FileList {
         }
 
         throw new IllegalStateException("Could not get dev class path.");
+    }
+
+    public static void initClassLoader(){
+        List<URL> urls = new ArrayList<URL>();
+        try {
+            urls.add(FileList.dirMods.toURI().toURL());
+        } catch (MalformedURLException e1) {
+            LittleMaidReengaged.Debug("malformed URL");
+        }
+        if(DevMode.DEVMODE==DevMode.DEVMODE_ECLIPSE){
+            for(File f:FileList.dirDevIncludeClasses){
+                try {
+                    urls.add(f.toURI().toURL());
+                } catch (MalformedURLException e) {
+                    LittleMaidReengaged.Debug("malformed URL");
+                }
+            }
+        }
+
+        FileList.COMMON_CLASS_LOADER = new FileList.CommonClassLoaderWrapper(urls.toArray(new URL[]{}), LittleMaidReengaged.class.getClassLoader());
     }
 
     private static File devPathAssets(){

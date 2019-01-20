@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import net.blacklab.lmr.LittleMaidReengaged;
+import net.blacklab.lmr.config.Config;
 import net.blacklab.lmr.entity.EntityLittleMaid;
 import net.blacklab.lmr.util.helper.CommonHelper;
 import net.blacklab.lmr.util.helper.OwnableEntityHelper;
@@ -152,7 +153,7 @@ public class IFF {
 	 */
 	public static int getIFF(UUID pUsername, String entityname, World world) {
 		if (entityname == null) {
-			return LittleMaidReengaged.cfg_Aggressive ? iff_Enemy : iff_Friendry;
+			return Config.cfg_Aggressive ? iff_Enemy : iff_Friendry;
 		}
 		int lt = iff_Enemy;
 		Map<String, Integer> lmap = getUserIFF(pUsername);
@@ -193,7 +194,7 @@ public class IFF {
 	 */
 	public static int getIFF(UUID pUsername, Entity entity) {
 		if (entity == null || !(entity instanceof EntityLivingBase)) {
-			return LittleMaidReengaged.cfg_Aggressive ? iff_Enemy : iff_Friendry;
+			return Config.cfg_Aggressive ? iff_Enemy : iff_Friendry;
 		}
 		String lename = EntityList.getEntityString(entity);
 		String lcname = lename;

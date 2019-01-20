@@ -1,6 +1,5 @@
 package net.blacklab.lmr.util.manager;
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Modifier;
@@ -9,6 +8,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import net.blacklab.lmr.LittleMaidReengaged;
+import net.blacklab.lmr.config.Config;
 import net.blacklab.lmr.util.DevMode;
 import net.blacklab.lmr.util.FileClassUtil;
 import net.blacklab.lmr.util.FileList;
@@ -135,6 +135,10 @@ public abstract class ManagerBase {
 
     }
 
+    public static String formatClassName(String className){
+        return className.replace("/", ".").replace("java.main.", "");
+    }
+
     private void loadClass(String pname) {
         String lclassname = "";
         try {
@@ -142,9 +146,7 @@ public abstract class ManagerBase {
             lclassname = pname.endsWith(".class") ? pname.substring(0, pname.lastIndexOf(".class")) : pname;
             Class lclass;
             if(lpackage != null) {
-                //lclassname = lpackage.getName() + "." + lclassname;
-                lclassname = lclassname.replace("/", ".").replace("java.main.", "");
-// LMM_EntityModeManager でしか使ってないので暫定
+                lclassname = formatClassName(lclassname);
                 lclass = FileList.COMMON_CLASS_LOADER.loadClass(lclassname);
             } else {
                 lclass = Class.forName(lclassname);
@@ -170,11 +172,11 @@ public abstract class ManagerBase {
         }
         catch (Exception exception) {
             LittleMaidReengaged.Debug("get%sClass-Exception.(%s)", getPreFix(), lclassname);
-            if(DevMode.DEVELOPMENT_DEBUG_MODE && LittleMaidReengaged.cfg_PrintDebugMessage) exception.printStackTrace();
+            if(DevMode.DEVELOPMENT_DEBUG_MODE && Config.cfg_PrintDebugMessage) exception.printStackTrace();
         }
         catch (Error error) {
             LittleMaidReengaged.Debug("get%sClass-Error: %s", getPreFix(), lclassname);
-            if(DevMode.DEVELOPMENT_DEBUG_MODE && LittleMaidReengaged.cfg_PrintDebugMessage) error.printStackTrace();
+            if(DevMode.DEVELOPMENT_DEBUG_MODE && Config.cfg_PrintDebugMessage) error.printStackTrace();
         }
 
     }

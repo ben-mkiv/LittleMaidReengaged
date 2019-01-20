@@ -21,6 +21,7 @@ import java.util.zip.ZipInputStream;
 
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.client.resource.OldZipTexturesWrapper;
+import net.blacklab.lmr.config.Config;
 import net.blacklab.lmr.entity.maidmodel.IModelEntity;
 import net.blacklab.lmr.entity.maidmodel.ModelMultiBase;
 import net.blacklab.lmr.entity.maidmodel.TextureBox;
@@ -34,8 +35,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
-
-import javax.annotation.Nonnull;
+import org.apache.logging.log4j.Level;
 
 public class ModelManager {
 
@@ -106,19 +106,29 @@ public class ModelManager {
 
 	public static final String[] searchFileNamePrefix = new String[]{"littleMaidMob","mmmlibx","ModelMulti","LittleMaidMob"};
 
-	public void init() {
-		// 検索対象ファイル名を登録します。
-		// パターンを登録しない場合、独自名称のMODファイル、テクスチャディレクトリ、クラスが読み込まれません。
+	public static void init() {
 		FileList.getModFile("littleMaidMob", "littleMaidMob");
 		FileList.getModFile("littleMaidMob", "mmmlibx");
 		FileList.getModFile("littleMaidMob", "ModelMulti");
 		FileList.getModFile("littleMaidMob", "LittleMaidMob");
 
-		addSearch("littleMaidMob", "/assets/minecraft/textures/entity/ModelMulti/", "ModelMulti_");
-		addSearch("littleMaidMob", "/assets/minecraft/textures/entity/littlemaid/", "ModelMulti_");
-		addSearch("littleMaidMob", "/assets/minecraft/textures/entity/littlemaid/", "ModelLittleMaid_");
-		addSearch("littleMaidMob", "/mob/ModelMulti/", "ModelMulti_");
-		addSearch("littleMaidMob", "/mob/littleMaid/", "ModelLittleMaid_");
+		instance.addSearch("littleMaidMob", "/mob/ModelMulti/", "ModelMulti_");
+        instance.addSearch("littleMaidMob", "/mob/littleMaid/", "ModelLittleMaid_");
+
+
+        instance.addSearch("littleMaidMob", "/assets/lmreengaged/textures/entity/ModelMulti/", "ModelMulti_");
+        instance.addSearch("littleMaidMob", "/assets/lmreengaged/textures/entity/littlemaid/", "ModelMulti_");
+        instance.addSearch("littleMaidMob", "/assets/lmreengaged/textures/entity/littlemaid/", "ModelLittleMaid_");
+
+
+        instance.loadTextures();
+
+        if (CommonHelper.isClient) {
+            LittleMaidReengaged.Debug(Level.INFO, "Localmode: initTextureList.");
+            instance.initTextureList(true);
+        } else {
+            instance.loadTextureServer();
+        }
 	}
 
 	protected String[] getSearch(String pName) {
@@ -311,7 +321,7 @@ public class ModelManager {
 		TextureBox lbox = new TextureBox("Crafter_Steve", new String[] {"", "", ""});
 		lbox.fileName = "";
 
-		lbox.addTexture(0x0c, "/assets/minecraft/textures/entity/steve.png");
+		//lbox.addTexture(0x0c, "/assets/minecraft/textures/entity/steve.png");
 		if (armorFilenamePrefix != null && armorFilenamePrefix.length > 0) {
 			for (String ls : armorFilenamePrefix) {
 				Map<Integer, ResourceLocation> lmap = new HashMap<Integer, ResourceLocation>();
@@ -328,84 +338,14 @@ public class ModelManager {
 
 
 	public boolean loadTextureServer() {
-		// サーバー用テクスチャ名称のインデクッスローダー
-		// 先ずは手持ちのテクスチャパックを追加する。
 		textureServer.clear();
 		for (TextureBox lbox : getTextureList()) {
 			textureServer.add(new TextureBoxServer(lbox));
 		}
-		// ファイルからロード
-/*
-		File lfile = FMLCommonHandler.instance().getMinecraftServerInstance().getFile(nameTextureIndex);
-		if (lfile.exists() && lfile.isFile()) {
-			try {
-				FileReader fr = new FileReader(lfile);
-				BufferedReader br = new BufferedReader(fr);
-				String ls;
-
-				while ((ls = br.readLine()) != null) {
-					String lt[] = ls.split(",");
-					if (lt.length >= 7) {
-						// ファイルのほうが優先
-						MMM_TextureBoxServer lbox = getTextureBoxServer(lt[6]);
-						if (lbox == null) {
-							lbox = new MMM_TextureBoxServer();
-							textureServer.add(lbox);
-						}
-						lbox.contractColor	= MMM_Helper.getHexToInt(lt[0]);
-						lbox.wildColor		= MMM_Helper.getHexToInt(lt[1]);
-						lbox.setModelSize(
-								Float.valueOf(lt[2]),
-								Float.valueOf(lt[3]),
-								Float.valueOf(lt[4]),
-								Float.valueOf(lt[5]));
-						lbox.textureName	= lt[6];
-					}
-				}
-
-				br.close();
-				fr.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			LittleMaidReengaged.Debug("Loaded ServerBoxList.(%d)", textureServer.size());
-			for (int li = 0; li < textureServer.size(); li++) {
-				MMM_TextureBoxServer lbox = textureServer.get(li);
-				LittleMaidReengaged.Debug("%04d=%s:%04x:%04x", li, lbox.textureName, lbox.contractColor, lbox.wildColor);
-			}
-			return true;
-		}
-*/
 		return false;
 	}
 
-	public void saveTextureServer() {
-		// サーバー用テクスチャ名称のインデクッスセーバー
-		File lfile = FMLCommonHandler.instance().getMinecraftServerInstance().getFile(nameTextureIndex);
-		try {
-			FileWriter fw = new FileWriter(lfile);
-			BufferedWriter bw = new BufferedWriter(fw);
 
-			for (TextureBoxServer lbox : textureServer) {
-				bw.write(String.format(
-						"%04x,%04x,%f,%f,%f,%f,%s",
-						lbox.getContractColorBits(),
-						lbox.getWildColorBits(),
-						lbox.getHeight(null),
-						lbox.getWidth(null),
-						lbox.getYOffset(null),
-						lbox.getMountedYOffset(null),
-						lbox.textureName));
-				bw.newLine();
-			}
-
-			bw.close();
-			fw.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * テクスチャインデックスを構築。
@@ -443,9 +383,7 @@ public class ModelManager {
 				Package lpackage = LittleMaidReengaged.class.getPackage();
 				Class lclass;
 				if (lpackage != null) {
-//					cn = (new StringBuilder("")).append(".").append(cn).toString();
-					cn = cn.replace("/", ".").replace("java.main.", "");
-					System.out.println("MMM_TextureManager.addModelClass : "+cn);
+					cn = ManagerBase.formatClassName(cn);
 					lclass = FileList.COMMON_CLASS_LOADER.loadClass(cn);
 				} else {
 					lclass = Class.forName(cn);
@@ -454,6 +392,9 @@ public class ModelManager {
 					LittleMaidReengaged.Debug("getModelClass-fail.");
 					return;
 				}
+
+				LittleMaidReengaged.Debug("addModelClass: '%s'", cn);
+
 				ModelMultiBase mlm[] = new ModelMultiBase[3];
 				Constructor<ModelMultiBase> cm = lclass.getConstructor(float.class);
 				mlm[0] = cm.newInstance(0.0F);
@@ -465,11 +406,11 @@ public class ModelManager {
 			}
 			catch (Exception exception) {
 				LittleMaidReengaged.Debug("getModelClass-Exception: %s", fname);
-				if(DevMode.DEVELOPMENT_DEBUG_MODE || LittleMaidReengaged.cfg_PrintDebugMessage) exception.printStackTrace();
+				if(DevMode.DEVELOPMENT_DEBUG_MODE || Config.cfg_PrintDebugMessage) exception.printStackTrace();
 			}
 			catch (Error error) {
 				LittleMaidReengaged.Debug("getModelClass-Error: %s", fname);
-				if(DevMode.DEVELOPMENT_DEBUG_MODE || LittleMaidReengaged.cfg_PrintDebugMessage) error.printStackTrace();
+				if(DevMode.DEVELOPMENT_DEBUG_MODE || Config.cfg_PrintDebugMessage) error.printStackTrace();
 			}
 		}
 	}
@@ -589,8 +530,11 @@ public class ModelManager {
 									break ADDMODEL;
 								}
 							}
-						}else if(tn.startsWith(rmn)) addModelClass(FileClassUtil.getClassName(tn, rmn), pSearch);
-					} else if(nfile.getName().endsWith(".png")) {
+						}
+						else if(tn.startsWith(rmn))
+							addModelClass(FileClassUtil.getClassName(tn, rmn), pSearch);
+					}
+					else if(nfile.getName().endsWith(".png")) {
 						String s = nfile.getPath().replace('\\', '/');
 						int i = s.indexOf(pSearch[1]);
 						if (i > -1) {
@@ -601,7 +545,7 @@ public class ModelManager {
 									String rin = FileClassUtil.getLinuxAntiDotName(f.getAbsolutePath());
 									if(tn.startsWith(rin)){
 										String cname = tn.substring(rin.length()+1);
-										String pr="assets/minecraft/";
+										String pr="assets/lmreengaged/";
 										if(cname.startsWith(pr)) cname=cname.substring(pr.length());
 										if(FMLCommonHandler.instance().getSide()==Side.CLIENT)
 											OldZipTexturesWrapper.keys.add(cname);
@@ -610,7 +554,6 @@ public class ModelManager {
 //							addTextureName(s.substring(i).replace('\\', '/'));
 						}
 					} else {
-						// サブフォルダ分のアーカイブを検索
 						addTexturesZip(nfile, pSearch);
 					}
 				}

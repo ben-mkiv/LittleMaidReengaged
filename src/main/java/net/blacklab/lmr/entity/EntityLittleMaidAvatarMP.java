@@ -1,6 +1,7 @@
 package net.blacklab.lmr.entity;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.util.EnumSound;
@@ -28,11 +29,12 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-
+import org.apache.logging.log4j.Level;
 
 
 public class EntityLittleMaidAvatarMP extends FakePlayer implements IEntityLittleMaidAvatar
 {
+	public static final String NAME = "littlemaid_avatar";
 	public EntityLittleMaid avatar;
 	/** いらん？ **/
 	public boolean isItemTrigger;
@@ -44,10 +46,9 @@ public class EntityLittleMaidAvatarMP extends FakePlayer implements IEntityLittl
 	private double appendY;
 	private double appendZ;
 
-	public EntityLittleMaidAvatarMP(World par1World)
-	{
+	public EntityLittleMaidAvatarMP(World par1World){
 		super(FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(par1World == null ? 0 : par1World.provider.getDimension()),
-				CommonHelper.newGameProfile("1", "LMM_EntityLittleMaidAvatar"));
+				CommonHelper.newGameProfile(UUID.randomUUID(), NAME));
 	}
 
 	public EntityLittleMaidAvatarMP(World par1World, EntityLittleMaid par2EntityLittleMaid) {
@@ -100,7 +101,7 @@ public class EntityLittleMaidAvatarMP extends FakePlayer implements IEntityLittl
 		return avatar.getHeldItem(pHand);
 	}
 
-	public World getEntityWorld(){ return super.getEntityWorld(); }
+	public World getEntityWorld(){ return avatar.getEntityWorld(); }
 	////////////////////////////////////////////////////////////////////////////////////
 
 	@Override
@@ -126,12 +127,12 @@ public class EntityLittleMaidAvatarMP extends FakePlayer implements IEntityLittl
 
 	@Override
 	protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-		return null;
+		return avatar.getHurtSound(damageSourceIn);
 	}
 
 	@Override
 	protected SoundEvent getDeathSound() {
-		return null;
+		return avatar.getDeathSound();
 	}
 
 	@Override
@@ -390,7 +391,7 @@ public class EntityLittleMaidAvatarMP extends FakePlayer implements IEntityLittl
 
 	@Override
 	public void sendMessage(ITextComponent var1) {
-		// チャットメッセージは使わない。
+		avatar.getOwner().sendMessage(var1);
 	}
 
 	// 不要？
@@ -620,12 +621,12 @@ public class EntityLittleMaidAvatarMP extends FakePlayer implements IEntityLittl
 
 	@Override
 	public float W_applyArmorCalculations(DamageSource par1DamageSource, float par2) {
-		return applyArmorCalculations(par1DamageSource, par2);
+		return avatar.applyArmorCalculations(par1DamageSource, par2);
 	}
 
 	@Override
 	public float W_applyPotionDamageCalculations(DamageSource par1DamageSource, float par2) {
-		return applyPotionDamageCalculations(par1DamageSource, par2);
+		return avatar.applyPotionDamageCalculations(par1DamageSource, par2);
 	}
 
 	@Override

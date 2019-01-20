@@ -1,6 +1,7 @@
 package net.blacklab.lmr.client.entity;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.entity.EntityLittleMaid;
@@ -42,11 +43,11 @@ public class EntityLittleMaidAvatarSP extends EntityPlayer implements IEntityLit
 
 	public EntityLittleMaidAvatarSP(World par1World)
 	{
-		super(par1World, CommonHelper.newGameProfile("1", "LMM_EntityLittleMaidAvatar"));
+		super(par1World, CommonHelper.newGameProfile(UUID.randomUUID(), "LMM_EntityLittleMaidAvatar"));
 	}
 
 	public EntityLittleMaidAvatarSP(World par1World, EntityLittleMaid par2EntityLittleMaid) {
-		super(par1World, CommonHelper.newGameProfile("1", "LMM_EntityLittleMaidAvatar"));
+		super(par1World, CommonHelper.newGameProfile(par2EntityLittleMaid.getUniqueID(), "LMM_EntityLittleMaidAvatar"));
 
 		// 初期設定
 		avatar = par2EntityLittleMaid;

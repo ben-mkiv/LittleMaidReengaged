@@ -2,9 +2,9 @@ package net.blacklab.lmr.client.renderer.entity;
 
 import java.util.List;
 
+import net.blacklab.lmr.config.Config;
 import org.lwjgl.opengl.GL11;
 
-import net.blacklab.lmr.LittleMaidReengaged;
 import net.blacklab.lmr.entity.maidmodel.IModelCaps;
 import net.blacklab.lmr.entity.maidmodel.IModelEntity;
 import net.blacklab.lmr.entity.maidmodel.ModelBaseDuo;
@@ -26,10 +26,10 @@ public class RenderModelMulti extends RenderLiving {
 	public RenderModelMulti(RenderManager manager,float pShadowSize) {
 		super(manager, null, pShadowSize);
 		modelFATT = new ModelBaseDuo(this);
-		modelFATT.isModelAlphablend = LittleMaidReengaged.cfg_isModelAlphaBlend;
+		modelFATT.isModelAlphablend = Config.cfg_isModelAlphaBlend;
 		modelFATT.isRendering = true;
 		modelMain = new ModelBaseSolo(this);
-		modelMain.isModelAlphablend = LittleMaidReengaged.cfg_isModelAlphaBlend;
+		modelMain.isModelAlphablend = Config.cfg_isModelAlphaBlend;
 		modelMain.capsLink = modelFATT;
 		mainModel = modelMain;
 		//setRenderPassModel(modelFATT);
@@ -134,35 +134,9 @@ public class RenderModelMulti extends RenderLiving {
 		mainModel.render(par1EntityLiving, par2, par3, par4, par5, par6, par7);
 	}
 
-	// TODO いらん？
-	/*
-	@Override
-	protected void renderEquippedItems(EntityLivingBase par1EntityLiving, float par2) {
-		// ハードポイントの描画
-		modelMain.renderItems(par1EntityLiving, this);
-		renderArrowsStuckInEntity(par1EntityLiving, par2);
-	}
-
-
-	@Override
-	protected void renderArrowsStuckInEntity(EntityLivingBase par1EntityLiving, float par2) {
-		Client.renderArrowsStuckInEntity(par1EntityLiving, par2, this, modelMain.model);
-	}
-
-
-
-	@Override
-	protected int getColorMultiplier(EntityLivingBase par1EntityLivingBase,
-			float par2, float par3) {
-		modelMain.renderCount = 16;
-		return super.getColorMultiplier(par1EntityLivingBase, par2, par3);
-	}
-
-	*/
 
 	@Override
 	protected ResourceLocation getEntityTexture(Entity var1) {
-		// テクスチャリソースを返すところだけれど、基本的に使用しない。
 		return null;
 	}
 

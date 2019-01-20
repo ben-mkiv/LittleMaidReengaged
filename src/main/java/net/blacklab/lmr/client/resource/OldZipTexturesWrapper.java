@@ -15,6 +15,8 @@ import net.minecraft.client.resources.data.IMetadataSection;
 import net.minecraft.client.resources.data.MetadataSerializer;
 import net.minecraft.util.ResourceLocation;
 
+import static net.blacklab.lmr.LittleMaidReengaged.MODID;
+
 public class OldZipTexturesWrapper implements IResourcePack {
 
 	public static ArrayList<String> keys = new ArrayList<String>();
@@ -47,7 +49,7 @@ public class OldZipTexturesWrapper implements IResourcePack {
 
 	@Override
 	public Set<String> getResourceDomains() {
-		return ImmutableSet.of("minecraft");
+		return ImmutableSet.of(MODID);
 	}
 
 	@Override
